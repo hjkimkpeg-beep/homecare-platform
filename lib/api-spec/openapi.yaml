@@ -3,20 +3,31 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: HomeCare Platform API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: packages
+    description: Service package operations
+  - name: orders
+    description: Order management
+  - name: assignments
+    description: Job assignment management
+  - name: admin
+    description: Admin operations
+  - name: auth
+    description: Authentication
+  - name: reviews
+    description: Reviews and A/S
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +35,413 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Unauthorized
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /packages:
+    get:
+      operationId: listPackages
+      tags: [packages]
+      summary: List service packages
+      responses:
+        "200":
+          description: List of packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServicePackage"
+
+  /packages/{id}:
+    get:
+      operationId: getPackage
+      tags: [packages]
+      summary: Get package detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Package detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServicePackageDetail"
+        "404":
+          description: Not found
+
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List orders for current customer
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderBody"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get order detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderDetail"
+        "404":
+          description: Not found
+
+  /orders/{id}/cancel:
+    post:
+      operationId: cancelOrder
+      tags: [orders]
+      summary: Cancel an order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /admin/orders:
+    get:
+      operationId: adminListOrders
+      tags: [admin]
+      summary: Admin list all orders
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Orders list with pagination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOrderListResponse"
+
+  /admin/orders/{id}:
+    get:
+      operationId: adminGetOrder
+      tags: [admin]
+      summary: Admin get order detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order detail with assignment info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOrderDetail"
+        "404":
+          description: Not found
+
+  /admin/orders/{id}/status:
+    patch:
+      operationId: adminUpdateOrderStatus
+      tags: [admin]
+      summary: Admin update order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrderStatusBody"
+      responses:
+        "200":
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /admin/dashboard:
+    get:
+      operationId: adminDashboard
+      tags: [admin]
+      summary: Admin dashboard summary
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDashboard"
+
+  /admin/assignments:
+    get:
+      operationId: adminListAssignments
+      tags: [admin]
+      summary: List job assignments
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Assignment list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobAssignment"
+
+  /admin/orders/{id}/assign:
+    post:
+      operationId: adminAssignOrder
+      tags: [admin]
+      summary: Assign order to partner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignOrderBody"
+      responses:
+        "200":
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobAssignment"
+
+  /admin/partners:
+    get:
+      operationId: adminListPartners
+      tags: [admin]
+      summary: List all partners
+      parameters:
+        - name: approvalStatus
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Partner list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PartnerProfile"
+
+  /admin/partners/{id}/approve:
+    post:
+      operationId: adminApprovePartner
+      tags: [admin]
+      summary: Approve or reject a partner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovePartnerBody"
+      responses:
+        "200":
+          description: Partner updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PartnerProfile"
+
+  /reviews:
+    post:
+      operationId: createReview
+      tags: [reviews]
+      summary: Create a review for a completed order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewBody"
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  /as-requests:
+    post:
+      operationId: createAsRequest
+      tags: [reviews]
+      summary: Create an A/S request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAsRequestBody"
+      responses:
+        "201":
+          description: A/S request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AsRequest"
+    get:
+      operationId: listAsRequests
+      tags: [reviews]
+      summary: List A/S requests for current user
+      responses:
+        "200":
+          description: A/S requests list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AsRequest"
+
+  /admin/as-requests:
+    get:
+      operationId: adminListAsRequests
+      tags: [admin]
+      summary: Admin list all A/S requests
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A/S requests list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AsRequest"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +452,493 @@ components:
       required:
         - status
 
+    LoginBody:
+      type: object
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+      required:
+        - phone
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required:
+        - user
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [customer, partner, operator, admin]
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, pending, suspended, deleted]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - role
+        - name
+        - phone
+        - status
+        - createdAt
+
+    ServicePackage:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        basePrice:
+          type: integer
+        estimatedMinutes:
+          type: integer
+        asWarrantyDays:
+          type: integer
+        isActive:
+          type: boolean
+        sortOrder:
+          type: integer
+      required:
+        - id
+        - name
+        - slug
+        - description
+        - basePrice
+        - estimatedMinutes
+        - asWarrantyDays
+        - isActive
+        - sortOrder
+
+    ServicePackageDetail:
+      allOf:
+        - $ref: "#/components/schemas/ServicePackage"
+        - type: object
+          properties:
+            includedItems:
+              type: array
+              items:
+                type: string
+            excludedItems:
+              type: array
+              items:
+                type: string
+            tasks:
+              type: array
+              items:
+                type: string
+          required:
+            - includedItems
+            - excludedItems
+            - tasks
+
+    CreateOrderBody:
+      type: object
+      properties:
+        packageId:
+          type: string
+        roadAddress:
+          type: string
+        detailAddress:
+          type: string
+        scheduledDate:
+          type: string
+          format: date-time
+        requestNote:
+          type: string
+          nullable: true
+      required:
+        - packageId
+        - roadAddress
+        - detailAddress
+        - scheduledDate
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        orderNumber:
+          type: string
+        customerId:
+          type: string
+        packageId:
+          type: string
+        packageName:
+          type: string
+        status:
+          type: string
+          enum:
+            - requested
+            - paid
+            - pending_assignment
+            - assigned
+            - en_route
+            - arrived
+            - in_progress
+            - inspection_pending
+            - inspection_approved
+            - completed
+            - cancelled
+            - as_requested
+        totalPrice:
+          type: integer
+        roadAddress:
+          type: string
+        detailAddress:
+          type: string
+        scheduledDate:
+          type: string
+          format: date-time
+        requestNote:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - orderNumber
+        - customerId
+        - packageId
+        - packageName
+        - status
+        - totalPrice
+        - roadAddress
+        - detailAddress
+        - scheduledDate
+        - createdAt
+        - updatedAt
+
+    OrderDetail:
+      allOf:
+        - $ref: "#/components/schemas/Order"
+        - type: object
+          properties:
+            statusLogs:
+              type: array
+              items:
+                $ref: "#/components/schemas/OrderStatusLog"
+            assignment:
+              $ref: "#/components/schemas/JobAssignment"
+              nullable: true
+            review:
+              $ref: "#/components/schemas/Review"
+              nullable: true
+          required:
+            - statusLogs
+
+    OrderStatusLog:
+      type: object
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        status:
+          type: string
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - orderId
+        - status
+        - createdAt
+
+    AdminOrderListResponse:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - orders
+        - total
+        - page
+        - limit
+
+    AdminOrderDetail:
+      allOf:
+        - $ref: "#/components/schemas/OrderDetail"
+        - type: object
+          properties:
+            customerName:
+              type: string
+            customerPhone:
+              type: string
+            partnerName:
+              type: string
+              nullable: true
+            partnerPhone:
+              type: string
+              nullable: true
+          required:
+            - customerName
+            - customerPhone
+
+    UpdateOrderStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+        note:
+          type: string
+          nullable: true
+      required:
+        - status
+
+    AdminDashboard:
+      type: object
+      properties:
+        totalOrders:
+          type: integer
+        pendingAssignment:
+          type: integer
+        inProgress:
+          type: integer
+        inspectionPending:
+          type: integer
+        completedToday:
+          type: integer
+        asRequests:
+          type: integer
+        ordersByStatus:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+              count:
+                type: integer
+            required:
+              - status
+              - count
+        recentOrders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
+      required:
+        - totalOrders
+        - pendingAssignment
+        - inProgress
+        - inspectionPending
+        - completedToday
+        - asRequests
+        - ordersByStatus
+        - recentOrders
+
+    JobAssignment:
+      type: object
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        partnerId:
+          type: string
+        partnerName:
+          type: string
+        partnerPhone:
+          type: string
+        status:
+          type: string
+          enum: [pending, accepted, rejected, cancelled, completed]
+        scheduledDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - orderId
+        - partnerId
+        - partnerName
+        - partnerPhone
+        - status
+        - scheduledDate
+        - createdAt
+
+    AssignOrderBody:
+      type: object
+      properties:
+        partnerId:
+          type: string
+      required:
+        - partnerId
+
+    PartnerProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        businessType:
+          type: string
+          enum: [individual, business]
+        grade:
+          type: string
+          enum: [G1, G2, G3, G4, G5]
+        ratingAvg:
+          type: number
+        ratingCount:
+          type: integer
+        approvalStatus:
+          type: string
+          enum: [pending, approved, rejected, suspended]
+        availabilityStatus:
+          type: string
+          enum: [available, busy, offline]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - name
+        - phone
+        - businessType
+        - grade
+        - ratingAvg
+        - ratingCount
+        - approvalStatus
+        - availabilityStatus
+        - createdAt
+
+    ApprovePartnerBody:
+      type: object
+      properties:
+        approvalStatus:
+          type: string
+          enum: [approved, rejected, suspended]
+        note:
+          type: string
+          nullable: true
+      required:
+        - approvalStatus
+
+    CreateReviewBody:
+      type: object
+      properties:
+        orderId:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+      required:
+        - orderId
+        - rating
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        customerId:
+          type: string
+        rating:
+          type: integer
+        comment:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - orderId
+        - customerId
+        - rating
+        - createdAt
+
+    CreateAsRequestBody:
+      type: object
+      properties:
+        orderId:
+          type: string
+        reason:
+          type: string
+        description:
+          type: string
+          nullable: true
+      required:
+        - orderId
+        - reason
+
+    AsRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        customerId:
+          type: string
+        reason:
+          type: string
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, assigned, in_progress, completed, rejected]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - orderId
+        - customerId
+        - reason
+        - status
+        - createdAt

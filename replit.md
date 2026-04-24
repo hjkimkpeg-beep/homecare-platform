@@ -1,19 +1,22 @@
-# Workspace
+# HomeCare Platform
 
 ## Overview
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+관리형 홈케어 마켓플레이스 플랫폼. 표준화된 패키지 상품을 기반으로 가격·품질·운영을 통제하는 관리형 마켓플레이스입니다.
+
+주문 → 배정 → 시공 → 검수 → 완료/A/S 흐름을 관리합니다.
 
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces
 - **Node.js version**: 24
 - **Package manager**: pnpm
-- **TypeScript version**: 5.9
-- **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
+- **Frontend**: React + Vite + Tailwind CSS + shadcn/ui (artifacts/homecare)
+- **Backend**: Express 5 (artifacts/api-server)
+- **Database**: PostgreSQL + Drizzle ORM (lib/db)
+- **Validation**: Zod (`zod/v4`)
+- **API codegen**: Orval (from OpenAPI spec in lib/api-spec/openapi.yaml)
+- **Auth**: Session-based (express-session + bcryptjs)
 - **Build**: esbuild (CJS bundle)
 
 ## Key Commands
@@ -22,6 +25,55 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `pnpm --filter @workspace/api-server run dev` — run API server locally
 
-See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+## Users & Roles
+
+- **고객(customer)**: 패키지 탐색, 예약, 주문 확인, 리뷰/A/S 신청
+- **파트너(partner)**: 배차 수락/거절, 작업 수행
+- **관리자(admin/operator)**: 주문 대시보드, 배차 관리, 파트너 승인, 검수 관리
+
+## Test Accounts
+
+| 역할 | 전화번호 | 비밀번호 |
+|------|---------|---------|
+| 관리자 | 010-0000-0001 | admin1234 |
+| 고객 (김철수) | 010-1111-2222 | customer1234 |
+| 고객 (이영희) | 010-3333-4444 | customer1234 |
+| 파트너 (박기사) | 010-5555-6666 | partner1234 |
+| 파트너 (최기사) | 010-7777-8888 | partner1234 |
+
+## Service Packages (5개)
+
+| 패키지 | 가격 | A/S 보증 |
+|--------|------|---------|
+| 90분 퀵픽스 | 30,000원 | 30일 |
+| 시니어 안심 | 80,000원 | 60일 |
+| 에너지 세이브 | 50,000원 | 30일 |
+| 임대 턴오버 | 150,000원 | 90일 |
+| 계절 점검 | 60,000원 | 30일 |
+
+## Order Status Flow
+
+requested → paid → pending_assignment → assigned → en_route → arrived → in_progress → inspection_pending → inspection_approved → completed → (as_requested)
+
+## Project Structure
+
+```
+artifacts/
+  homecare/           # React + Vite 프론트엔드
+  api-server/         # Express API 서버
+lib/
+  api-spec/           # OpenAPI 스펙 (openapi.yaml)
+  api-client-react/   # 생성된 React Query 훅
+  api-zod/            # 생성된 Zod 스키마
+  db/                 # Drizzle ORM 스키마 + 연결
+```
+
+## DB Schema Tables
+
+- users, customer_profiles, customer_addresses
+- partner_profiles
+- service_packages, package_included_items, package_excluded_items, package_tasks
+- orders, order_status_logs
+- job_assignments
+- reviews, as_requests

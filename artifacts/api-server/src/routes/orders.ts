@@ -1,0 +1,275 @@
+import { Router, type IRouter } from "express";
+import { eq, desc } from "drizzle-orm";
+import {
+  db,
+  ordersTable,
+  orderStatusLogsTable,
+  servicePackagesTable,
+  jobAssignmentsTable,
+  partnerProfilesTable,
+  usersTable,
+  reviewsTable,
+  customerProfilesTable,
+} from "@workspace/db";
+import { requireAuth } from "../middlewares/auth";
+import "../lib/session";
+
+const router: IRouter = Router();
+
+function generateOrderNumber(): string {
+  const now = new Date();
+  const yyyymmdd = now.toISOString().slice(0, 10).replace(/-/g, "");
+  const rand = Math.floor(Math.random() * 9000) + 1000;
+  return `HC${yyyymmdd}${rand}`;
+}
+
+router.get("/orders", requireAuth, async (req, res): Promise<void> => {
+  const customerId = req.session.customerProfileId;
+  if (!customerId) {
+    res.status(403).json({ error: "고객 계정만 이용 가능합니다" });
+    return;
+  }
+
+  const { status } = req.query;
+
+  let query = db
+    .select()
+    .from(ordersTable)
+    .where(eq(ordersTable.customerId, customerId))
+    .orderBy(desc(ordersTable.createdAt));
+
+  const orders = await query;
+  const filtered = status
+    ? orders.filter((o) => o.status === status)
+    : orders;
+
+  res.json(filtered.map((o) => ({
+    id: o.id,
+    orderNumber: o.orderNumber,
+    customerId: o.customerId,
+    packageId: o.packageId,
+    packageName: o.packageName,
+    status: o.status,
+    totalPrice: o.totalPrice,
+    roadAddress: o.roadAddress,
+    detailAddress: o.detailAddress,
+    scheduledDate: o.scheduledDate,
+    requestNote: o.requestNote,
+    createdAt: o.createdAt,
+    updatedAt: o.updatedAt,
+  })));
+});
+
+router.post("/orders", requireAuth, async (req, res): Promise<void> => {
+  const customerId = req.session.customerProfileId;
+  if (!customerId) {
+    res.status(403).json({ error: "고객 계정만 이용 가능합니다" });
+    return;
+  }
+
+  const { packageId, roadAddress, detailAddress, scheduledDate, requestNote } = req.body;
+  if (!packageId || !roadAddress || !detailAddress || !scheduledDate) {
+    res.status(400).json({ error: "필수 항목을 입력해주세요" });
+    return;
+  }
+
+  const [pkg] = await db
+    .select()
+    .from(servicePackagesTable)
+    .where(eq(servicePackagesTable.id, packageId));
+
+  if (!pkg) {
+    res.status(404).json({ error: "패키지를 찾을 수 없습니다" });
+    return;
+  }
+
+  const orderNumber = generateOrderNumber();
+
+  const [order] = await db
+    .insert(ordersTable)
+    .values({
+      orderNumber,
+      customerId,
+      packageId,
+      packageName: pkg.name,
+      status: "pending_assignment",
+      totalPrice: pkg.basePrice,
+      roadAddress,
+      detailAddress,
+      scheduledDate: new Date(scheduledDate),
+      requestNote: requestNote || null,
+    })
+    .returning();
+
+  await db.insert(orderStatusLogsTable).values({
+    orderId: order.id,
+    status: "pending_assignment",
+    note: "예약이 접수되었습니다",
+    createdBy: req.session.userId,
+  });
+
+  res.status(201).json({
+    id: order.id,
+    orderNumber: order.orderNumber,
+    customerId: order.customerId,
+    packageId: order.packageId,
+    packageName: order.packageName,
+    status: order.status,
+    totalPrice: order.totalPrice,
+    roadAddress: order.roadAddress,
+    detailAddress: order.detailAddress,
+    scheduledDate: order.scheduledDate,
+    requestNote: order.requestNote,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+  });
+});
+
+router.get("/orders/:id", requireAuth, async (req, res): Promise<void> => {
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const customerId = req.session.customerProfileId;
+
+  const [order] = await db
+    .select()
+    .from(ordersTable)
+    .where(eq(ordersTable.id, id));
+
+  if (!order) {
+    res.status(404).json({ error: "주문을 찾을 수 없습니다" });
+    return;
+  }
+
+  if (customerId && order.customerId !== customerId) {
+    res.status(403).json({ error: "권한이 없습니다" });
+    return;
+  }
+
+  const [statusLogs, assignments, reviewData] = await Promise.all([
+    db
+      .select()
+      .from(orderStatusLogsTable)
+      .where(eq(orderStatusLogsTable.orderId, id))
+      .orderBy(orderStatusLogsTable.createdAt),
+    db
+      .select({
+        assignment: jobAssignmentsTable,
+        partnerUser: usersTable,
+      })
+      .from(jobAssignmentsTable)
+      .leftJoin(partnerProfilesTable, eq(jobAssignmentsTable.partnerId, partnerProfilesTable.id))
+      .leftJoin(usersTable, eq(partnerProfilesTable.userId, usersTable.id))
+      .where(eq(jobAssignmentsTable.orderId, id))
+      .orderBy(desc(jobAssignmentsTable.createdAt))
+      .limit(1),
+    db
+      .select()
+      .from(reviewsTable)
+      .where(eq(reviewsTable.orderId, id))
+      .limit(1),
+  ]);
+
+  const activeAssignment = assignments[0];
+  const review = reviewData[0];
+
+  res.json({
+    id: order.id,
+    orderNumber: order.orderNumber,
+    customerId: order.customerId,
+    packageId: order.packageId,
+    packageName: order.packageName,
+    status: order.status,
+    totalPrice: order.totalPrice,
+    roadAddress: order.roadAddress,
+    detailAddress: order.detailAddress,
+    scheduledDate: order.scheduledDate,
+    requestNote: order.requestNote,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    statusLogs: statusLogs.map((l) => ({
+      id: l.id,
+      orderId: l.orderId,
+      status: l.status,
+      note: l.note,
+      createdAt: l.createdAt,
+    })),
+    assignment: activeAssignment
+      ? {
+          id: activeAssignment.assignment.id,
+          orderId: activeAssignment.assignment.orderId,
+          partnerId: activeAssignment.assignment.partnerId,
+          partnerName: activeAssignment.partnerUser?.name || "파트너",
+          partnerPhone: activeAssignment.partnerUser?.phone || "",
+          status: activeAssignment.assignment.status,
+          scheduledDate: activeAssignment.assignment.scheduledDate,
+          createdAt: activeAssignment.assignment.createdAt,
+        }
+      : null,
+    review: review
+      ? {
+          id: review.id,
+          orderId: review.orderId,
+          customerId: review.customerId,
+          rating: review.rating,
+          comment: review.comment,
+          createdAt: review.createdAt,
+        }
+      : null,
+  });
+});
+
+router.post("/orders/:id/cancel", requireAuth, async (req, res): Promise<void> => {
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const customerId = req.session.customerProfileId;
+
+  const [order] = await db
+    .select()
+    .from(ordersTable)
+    .where(eq(ordersTable.id, id));
+
+  if (!order) {
+    res.status(404).json({ error: "주문을 찾을 수 없습니다" });
+    return;
+  }
+
+  if (customerId && order.customerId !== customerId) {
+    res.status(403).json({ error: "권한이 없습니다" });
+    return;
+  }
+
+  const cancelableStatuses = ["pending_assignment", "paid", "requested"];
+  if (!cancelableStatuses.includes(order.status)) {
+    res.status(400).json({ error: "현재 상태에서는 취소할 수 없습니다" });
+    return;
+  }
+
+  const [updated] = await db
+    .update(ordersTable)
+    .set({ status: "cancelled" })
+    .where(eq(ordersTable.id, id))
+    .returning();
+
+  await db.insert(orderStatusLogsTable).values({
+    orderId: id,
+    status: "cancelled",
+    note: "고객 취소",
+    createdBy: req.session.userId,
+  });
+
+  res.json({
+    id: updated.id,
+    orderNumber: updated.orderNumber,
+    customerId: updated.customerId,
+    packageId: updated.packageId,
+    packageName: updated.packageName,
+    status: updated.status,
+    totalPrice: updated.totalPrice,
+    roadAddress: updated.roadAddress,
+    detailAddress: updated.detailAddress,
+    scheduledDate: updated.scheduledDate,
+    requestNote: updated.requestNote,
+    createdAt: updated.createdAt,
+    updatedAt: updated.updatedAt,
+  });
+});
+
+export default router;
