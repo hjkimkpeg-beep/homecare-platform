@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { formatCurrency, getOrderStatusColor, translateOrderStatus } from "@/lib/format";
 import { ChevronRight, Clock, ShieldCheck, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/components/auth-provider";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function CustomerHome() {
   const { user } = useAuth();

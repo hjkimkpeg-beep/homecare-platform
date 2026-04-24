@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/components/auth-provider";
+import { useAuth } from "@/hooks/use-auth";
 import { Home, ClipboardList, Wrench, User } from "lucide-react";
 
 export function CustomerLayout({ children }: { children: ReactNode }) {
