@@ -71,7 +71,7 @@ export default function CustomerHome() {
   return (
     <CustomerLayout>
       {/* ── Dark Hero ── */}
-      <section className="bg-[#0f1729] px-6 pt-12 pb-14 relative overflow-hidden">
+      <section className="bg-[#0f1729] relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -80,47 +80,69 @@ export default function CustomerHome() {
             backgroundSize: "40px 40px",
           }}
         />
-        <div className="relative max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 mb-6">
-            <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
-              <KeyRound className="w-4 h-4 text-white" />
+
+        <div className="relative px-6 sm:px-10 lg:px-20 pt-12 pb-14 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* ─ Left: text ─ */}
+          <div>
+            <div className="inline-flex items-center gap-2 mb-6">
+              <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
+                <KeyRound className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-blue-400 text-sm font-semibold tracking-wide">HomeCare Platform</span>
             </div>
-            <span className="text-blue-400 text-sm font-semibold tracking-wide">HomeCare Platform</span>
-          </div>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-4">
-            집 수리, 이제<br />
-            <span className="text-blue-400">정가제</span>로 믿고 맡기세요
-          </h1>
-          <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-8 max-w-md">
-            전문 파트너가 고정 가격으로 방문합니다.<br />
-            추가 비용 없이 투명하게, 품질 보증까지 받으세요.
-          </p>
+            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-5">
+              집 수리, 이제<br />
+              <span className="text-blue-400">정가제</span>로 믿고 맡기세요
+            </h1>
+            <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-8">
+              전문 파트너가 고정 가격으로 방문합니다.<br />
+              추가 비용 없이 투명하게, 품질 보증까지 받으세요.
+            </p>
 
-          <div className="flex flex-wrap gap-3">
-            <button
-              className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
-              onClick={() =>
-                document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              서비스 예약하기
-              <ChevronRight className="w-4 h-4" />
-            </button>
-            <Link href={user ? "/orders" : "/login"}>
-              <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm border border-white/10">
-                예약 현황 조회
+            <div className="flex flex-wrap gap-3">
+              <button
+                className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
+                onClick={() =>
+                  document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" })
+                }
+              >
+                서비스 예약하기
+                <ChevronRight className="w-4 h-4" />
               </button>
-            </Link>
+              <Link href={user ? "/orders" : "/login"}>
+                <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm border border-white/10">
+                  예약 현황 조회
+                </button>
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-6 mt-10 pt-8 border-t border-white/10">
+              {HERO_STATS.map(({ label, value, icon: Icon }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <Icon className="w-4 h-4 text-blue-400" />
+                  <div>
+                    <p className="text-white text-sm font-bold">{value}</p>
+                    <p className="text-gray-500 text-[11px]">{label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-6 mt-10 pt-8 border-t border-white/10">
-            {HERO_STATS.map(({ label, value, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-2">
-                <Icon className="w-4 h-4 text-blue-400" />
+          {/* ─ Right: trust cards ─ */}
+          <div className="hidden lg:grid grid-cols-1 gap-4">
+            {TRUST_ITEMS.map(({ icon: Icon, iconBg, iconColor, title, desc }) => (
+              <div
+                key={title}
+                className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-start gap-4 backdrop-blur-sm"
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
+                  <Icon className={`w-5 h-5 ${iconColor}`} />
+                </div>
                 <div>
-                  <p className="text-white text-sm font-bold">{value}</p>
-                  <p className="text-gray-500 text-[11px]">{label}</p>
+                  <p className="text-white font-semibold text-sm mb-1">{title}</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
