@@ -17,7 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     query: { retry: false }
   });
   
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const logoutMutation = useLogout();
 
   const handleLogout = () => {
@@ -27,6 +27,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
   };
+
+  useEffect(() => {
+    if (isLoading || !user) return;
+
+    const role = user.role;
+
+    if (role === "partner") {
+      if (!location.startsWith("/partner")) {
+        setLocation("/partner/jobs");
+      }
+    } else if (role === "admin" || role === "operator") {
+      if (!location.startsWith("/admin")) {
+        setLocation("/admin");
+      }
+    }
+  }, [user, isLoading, location, setLocation]);
 
   if (isLoading) {
     return (
