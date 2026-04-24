@@ -165,7 +165,10 @@
   }
 }
 
-/* 1920×1080 대응 – 기본 폰트를 비례 확대 (1536px+ → 18px) */
+/* 대형 화면 폰트 비례 확대 */
 @media (min-width: 1536px) {
   html { font-size: 112.5%; } /* 16px → 18px */
+}
+@media (min-width: 1920px) {
+  html { font-size: 137.5%; } /* 16px → 22px */
 }
