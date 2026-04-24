@@ -13,6 +13,13 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
     { href: "/as-requests", label: "A/S요청", icon: Wrench },
   ];
 
+  const isCustomerArea =
+    location === "/" ||
+    location.startsWith("/packages") ||
+    location.startsWith("/book") ||
+    location.startsWith("/orders") ||
+    location.startsWith("/as-requests");
+
   return (
     <div className="min-h-[100dvh] bg-gray-50 flex flex-col">
       {/* Header */}
@@ -28,17 +35,23 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
 
         <nav className="flex items-center gap-1">
           <Link href="/">
-            <span className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-              location === "/" || location.startsWith("/packages") || location.startsWith("/book") || location.startsWith("/orders") || location.startsWith("/as-requests")
-                ? "bg-white/10 text-white"
-                : "text-gray-400 hover:text-white"
-            }`}>고객</span>
+            <span
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                isCustomerArea ? "bg-white/10 text-white" : "text-gray-400 hover:text-white"
+              }`}
+            >
+              고객
+            </span>
           </Link>
-          <Link href="/admin">
-            <span className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">관리자</span>
+          <Link href="/admin/login">
+            <span className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">
+              관리자
+            </span>
           </Link>
-          <Link href="/partner/jobs">
-            <span className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">파트너</span>
+          <Link href="/partner/login">
+            <span className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">
+              파트너
+            </span>
           </Link>
           {user && (
             <button

@@ -16,6 +16,7 @@ import CustomerOrderDetail from "@/pages/customer/order-detail";
 import CustomerAsRequests from "@/pages/customer/as-requests";
 
 // Admin Pages
+import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminOrders from "@/pages/admin/orders";
 import AdminOrderDetail from "@/pages/admin/order-detail";
@@ -23,6 +24,8 @@ import AdminPartners from "@/pages/admin/partners";
 import AdminAsRequests from "@/pages/admin/as-requests";
 
 // Partner Pages
+import PartnerLogin from "@/pages/partner/login";
+import PartnerRegister from "@/pages/partner/register";
 import PartnerJobs from "@/pages/partner/jobs";
 import PartnerJobDetail from "@/pages/partner/job-detail";
 import PartnerHistory from "@/pages/partner/history";
@@ -59,27 +62,35 @@ function PartnerGuard({ component: Component }: { component: React.ComponentType
 function Router() {
   return (
     <Switch>
+      {/* Shared login (customer default) */}
       <Route path="/login" component={Login} />
 
+      {/* Role-specific login */}
+      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/partner/login" component={PartnerLogin} />
+      <Route path="/partner/register" component={PartnerRegister} />
+
+      {/* Customer */}
       <Route path="/">
         {() => <CustomerGuard component={CustomerHome} />}
       </Route>
       <Route path="/packages/:id">
-        {(params) => <CustomerGuard component={() => <PackageDetail />} />}
+        {() => <CustomerGuard component={() => <PackageDetail />} />}
       </Route>
       <Route path="/book/:packageId">
-        {(params) => <CustomerGuard component={() => <BookPackage />} />}
+        {() => <CustomerGuard component={() => <BookPackage />} />}
       </Route>
       <Route path="/orders">
         {() => <CustomerGuard component={CustomerOrders} />}
       </Route>
       <Route path="/orders/:id">
-        {(params) => <CustomerGuard component={() => <CustomerOrderDetail />} />}
+        {() => <CustomerGuard component={() => <CustomerOrderDetail />} />}
       </Route>
       <Route path="/as-requests">
         {() => <CustomerGuard component={CustomerAsRequests} />}
       </Route>
 
+      {/* Admin */}
       <Route path="/admin">
         {() => <AdminGuard component={AdminDashboard} />}
       </Route>
@@ -87,7 +98,7 @@ function Router() {
         {() => <AdminGuard component={AdminOrders} />}
       </Route>
       <Route path="/admin/orders/:id">
-        {(params) => <AdminGuard component={() => <AdminOrderDetail />} />}
+        {() => <AdminGuard component={() => <AdminOrderDetail />} />}
       </Route>
       <Route path="/admin/partners">
         {() => <AdminGuard component={AdminPartners} />}
@@ -96,11 +107,12 @@ function Router() {
         {() => <AdminGuard component={AdminAsRequests} />}
       </Route>
 
+      {/* Partner */}
       <Route path="/partner/jobs">
         {() => <PartnerGuard component={PartnerJobs} />}
       </Route>
       <Route path="/partner/jobs/:orderId">
-        {(params) => <PartnerGuard component={() => <PartnerJobDetail />} />}
+        {() => <PartnerGuard component={() => <PartnerJobDetail />} />}
       </Route>
       <Route path="/partner/history">
         {() => <PartnerGuard component={PartnerHistory} />}

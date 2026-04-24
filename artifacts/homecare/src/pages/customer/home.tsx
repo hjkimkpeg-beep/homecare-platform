@@ -80,7 +80,7 @@ export default function CustomerHome() {
             backgroundSize: "40px 40px",
           }}
         />
-        <div className="relative max-w-2xl">
+        <div className="relative max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 mb-6">
             <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
               <KeyRound className="w-4 h-4 text-white" />

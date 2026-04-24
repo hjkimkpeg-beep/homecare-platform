@@ -99,4 +99,68 @@ router.get("/auth/me", async (req, res): Promise<void> => {
   });
 });
 
+router.post("/auth/register/partner", async (req, res): Promise<void> => {
+  const {
+    name,
+    phone,
+    password,
+    email,
+    businessType = "individual",
+    serviceArea,
+    career,
+    certifications,
+    experienceYears = 0,
+  } = req.body;
+
+  if (!name || !phone || !password) {
+    res.status(400).json({ error: "이름, 전화번호, 비밀번호는 필수입니다" });
+    return;
+  }
+
+  const [existing] = await db.select().from(usersTable).where(eq(usersTable.phone, phone));
+  if (existing) {
+    res.status(409).json({ error: "이미 사용 중인 전화번호입니다" });
+    return;
+  }
+
+  const passwordHash = await bcryptjs.hash(password, 10);
+
+  const [newUser] = await db
+    .insert(usersTable)
+    .values({
+      role: "partner",
+      name,
+      phone,
+      email: email || null,
+      passwordHash,
+      status: "active",
+    })
+    .returning();
+
+  const [profile] = await db
+    .insert(partnerProfilesTable)
+    .values({
+      userId: newUser.id,
+      businessType: businessType === "business" ? "business" : "individual",
+      approvalStatus: "pending",
+      serviceArea: serviceArea || null,
+      career: career || null,
+      certifications: certifications || null,
+      experienceYears: parseInt(String(experienceYears), 10) || 0,
+    })
+    .returning();
+
+  res.status(201).json({
+    user: {
+      id: newUser.id,
+      role: newUser.role,
+      name: newUser.name,
+      phone: newUser.phone,
+      status: newUser.status,
+    },
+    profileId: profile.id,
+    approvalStatus: profile.approvalStatus,
+  });
+});
+
 export default router;

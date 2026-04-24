@@ -20,6 +20,10 @@ export const partnerProfilesTable = pgTable("partner_profiles", {
   serviceRadiusKm: integer("service_radius_km").notNull().default(10),
   bankInfoMasked: varchar("bank_info_masked", { length: 100 }),
   approvalNote: text("approval_note"),
+  serviceArea: varchar("service_area", { length: 200 }),
+  career: text("career"),
+  certifications: text("certifications"),
+  experienceYears: integer("experience_years").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
