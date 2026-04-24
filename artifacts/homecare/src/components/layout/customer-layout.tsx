@@ -23,20 +23,20 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-[100dvh] bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="bg-[#0f1729] px-6 py-4 sticky top-0 z-20 flex items-center justify-between">
+      <header className="bg-[#0f1729] px-6 2xl:px-16 py-4 2xl:py-5 sticky top-0 z-20 flex items-center justify-between">
         <Link href="/">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
-              <KeyRound className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-2 2xl:gap-3 cursor-pointer">
+            <div className="w-7 h-7 2xl:w-9 2xl:h-9 bg-blue-500 rounded-lg flex items-center justify-center">
+              <KeyRound className="w-4 h-4 2xl:w-5 2xl:h-5 text-white" />
             </div>
-            <span className="font-bold text-white text-lg tracking-tight">HomeCare</span>
+            <span className="font-bold text-white text-lg 2xl:text-2xl tracking-tight">HomeCare</span>
           </div>
         </Link>
 
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-1 2xl:gap-2">
           <Link href="/">
             <span
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 2xl:px-5 2xl:py-2 rounded-lg text-sm 2xl:text-base font-medium transition-colors cursor-pointer ${
                 isCustomerArea ? "bg-white/10 text-white" : "text-gray-400 hover:text-white"
               }`}
             >
@@ -44,19 +44,19 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
             </span>
           </Link>
           <Link href="/admin/login">
-            <span className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">
+            <span className="px-3 py-1.5 2xl:px-5 2xl:py-2 rounded-lg text-sm 2xl:text-base font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">
               관리자
             </span>
           </Link>
           <Link href="/partner/login">
-            <span className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">
+            <span className="px-3 py-1.5 2xl:px-5 2xl:py-2 rounded-lg text-sm 2xl:text-base font-medium text-gray-400 hover:text-white transition-colors cursor-pointer">
               파트너
             </span>
           </Link>
           {user && (
             <button
               onClick={logout}
-              className="ml-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              className="ml-2 px-3 py-1.5 2xl:px-5 2xl:py-2 rounded-lg text-sm 2xl:text-base font-medium text-gray-400 hover:text-white transition-colors"
             >
               {user.name}님
             </button>

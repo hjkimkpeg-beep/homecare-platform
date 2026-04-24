@@ -38,7 +38,7 @@ export default function CustomerHome() {
 
   return (
     <CustomerLayout>
-      <section className="bg-[#0f1729] min-h-[calc(100dvh-56px)] relative overflow-hidden flex items-center">
+      <section className="bg-[#0f1729] min-h-[calc(100dvh-56px)] 2xl:min-h-[calc(100dvh-72px)] relative overflow-hidden flex items-center">
         {/* grid overlay */}
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -49,46 +49,46 @@ export default function CustomerHome() {
           }}
         />
 
-        <div className="relative w-full px-6 sm:px-10 lg:px-20 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="relative w-full px-6 sm:px-10 lg:px-20 xl:px-28 2xl:px-40 py-16 2xl:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 2xl:gap-20 items-center">
           {/* ─ Left: main content ─ */}
           <div>
-            <div className="inline-flex items-center gap-2 mb-8">
-              <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
-                <KeyRound className="w-4 h-4 text-white" />
+            <div className="inline-flex items-center gap-2 2xl:gap-3 mb-8 2xl:mb-10">
+              <div className="w-7 h-7 2xl:w-10 2xl:h-10 bg-blue-500 rounded-lg 2xl:rounded-xl flex items-center justify-center">
+                <KeyRound className="w-4 h-4 2xl:w-5 2xl:h-5 text-white" />
               </div>
-              <span className="text-blue-400 text-sm font-semibold tracking-wide">HomeCare Platform</span>
+              <span className="text-blue-400 text-sm 2xl:text-lg font-semibold tracking-wide">HomeCare Platform</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold text-white leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold text-white leading-tight mb-6 2xl:mb-10">
               집 수리, 이제<br />
               <span className="text-blue-400">정가제</span>로 믿고 맡기세요
             </h1>
-            <p className="text-gray-400 text-base sm:text-lg leading-relaxed mb-10">
+            <p className="text-gray-400 text-base sm:text-lg 2xl:text-2xl leading-relaxed mb-10 2xl:mb-14">
               전문 파트너가 고정 가격으로 방문합니다.<br />
               추가 비용 없이 투명하게, 품질 보증까지 받으세요.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 2xl:gap-6">
               <Link href="/packages">
-                <button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-xl transition-colors text-base shadow-lg shadow-blue-500/30">
+                <button className="flex items-center gap-2 2xl:gap-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 2xl:px-12 2xl:py-5 rounded-xl 2xl:rounded-2xl transition-colors text-base 2xl:text-xl shadow-lg shadow-blue-500/30">
                   서비스 예약하기
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-5 h-5 2xl:w-6 2xl:h-6" />
                 </button>
               </Link>
               <Link href="/booking-lookup">
-                <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-xl transition-colors text-base border border-white/20">
+                <button className="flex items-center gap-2 2xl:gap-3 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 2xl:px-12 2xl:py-5 rounded-xl 2xl:rounded-2xl transition-colors text-base 2xl:text-xl border border-white/20">
                   예약 현황 조회
                 </button>
               </Link>
             </div>
 
-            <div className="flex flex-wrap gap-8 mt-12 pt-10 border-t border-white/10">
+            <div className="flex flex-wrap gap-8 2xl:gap-14 mt-12 2xl:mt-16 pt-10 2xl:pt-12 border-t border-white/10">
               {HERO_STATS.map(({ label, value, icon: Icon }) => (
-                <div key={label} className="flex items-center gap-3">
-                  <Icon className="w-5 h-5 text-blue-400" />
+                <div key={label} className="flex items-center gap-3 2xl:gap-4">
+                  <Icon className="w-5 h-5 2xl:w-7 2xl:h-7 text-blue-400" />
                   <div>
-                    <p className="text-white text-base font-bold">{value}</p>
-                    <p className="text-gray-500 text-xs">{label}</p>
+                    <p className="text-white text-base 2xl:text-xl font-bold">{value}</p>
+                    <p className="text-gray-500 text-xs 2xl:text-sm">{label}</p>
                   </div>
                 </div>
               ))}
@@ -96,18 +96,18 @@ export default function CustomerHome() {
           </div>
 
           {/* ─ Right: trust cards ─ */}
-          <div className="hidden lg:grid grid-cols-1 gap-4">
+          <div className="hidden lg:grid grid-cols-1 gap-4 2xl:gap-6">
             {TRUST_ITEMS.map(({ icon: Icon, iconBg, iconColor, title, desc }) => (
               <div
                 key={title}
-                className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-start gap-4"
+                className="bg-white/5 border border-white/10 rounded-2xl 2xl:rounded-3xl p-5 2xl:p-8 flex items-start gap-4 2xl:gap-6"
               >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
-                  <Icon className={`w-5 h-5 ${iconColor}`} />
+                <div className={`w-11 h-11 2xl:w-16 2xl:h-16 rounded-xl 2xl:rounded-2xl flex items-center justify-center shrink-0 ${iconBg}`}>
+                  <Icon className={`w-5 h-5 2xl:w-8 2xl:h-8 ${iconColor}`} />
                 </div>
                 <div>
-                  <p className="text-white font-semibold mb-1">{title}</p>
-                  <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+                  <p className="text-white font-semibold mb-1 2xl:mb-2 2xl:text-xl">{title}</p>
+                  <p className="text-gray-400 text-sm 2xl:text-base leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
