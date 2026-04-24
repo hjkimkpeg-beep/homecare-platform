@@ -5,6 +5,7 @@ import packagesRouter from "./packages";
 import ordersRouter from "./orders";
 import adminRouter from "./admin";
 import reviewsRouter from "./reviews";
+import partnerRouter from "./partner";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(packagesRouter);
 router.use(ordersRouter);
 router.use(adminRouter);
 router.use(reviewsRouter);
+router.use(partnerRouter);
 
 export default router;

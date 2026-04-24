@@ -21,6 +21,11 @@ import AdminOrderDetail from "@/pages/admin/order-detail";
 import AdminPartners from "@/pages/admin/partners";
 import AdminAsRequests from "@/pages/admin/as-requests";
 
+// Partner Pages
+import PartnerJobs from "@/pages/partner/jobs";
+import PartnerJobDetail from "@/pages/partner/job-detail";
+import PartnerHistory from "@/pages/partner/history";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -47,6 +52,10 @@ function Router() {
       <Route path="/admin/orders/:id" component={AdminOrderDetail} />
       <Route path="/admin/partners" component={AdminPartners} />
       <Route path="/admin/as-requests" component={AdminAsRequests} />
+
+      <Route path="/partner/jobs" component={PartnerJobs} />
+      <Route path="/partner/jobs/:orderId" component={PartnerJobDetail} />
+      <Route path="/partner/history" component={PartnerHistory} />
 
       <Route component={NotFound} />
     </Switch>

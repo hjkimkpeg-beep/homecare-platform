@@ -43,6 +43,8 @@ export default function Login() {
     if (!isAuthLoading && user) {
       if (user.role === "admin" || user.role === "operator") {
         setLocation("/admin");
+      } else if (user.role === "partner") {
+        setLocation("/partner/jobs");
       } else {
         setLocation("/");
       }
@@ -57,6 +59,8 @@ export default function Login() {
           queryClient.setQueryData(getGetMeQueryKey(), data.user);
           if (data.user.role === "admin" || data.user.role === "operator") {
             setLocation("/admin");
+          } else if (data.user.role === "partner") {
+            setLocation("/partner/jobs");
           } else {
             setLocation("/");
           }
