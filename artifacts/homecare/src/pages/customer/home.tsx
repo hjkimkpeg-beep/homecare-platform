@@ -91,13 +91,14 @@ export default function CustomerHome() {
               <span className="text-blue-400 text-sm font-semibold tracking-wide">HomeCare Platform</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-5">
-              집 수리, 이제<br />
-              <span className="text-blue-400">정가제</span>로 믿고 맡기세요
+            <h1 className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white leading-snug mb-5">
+              <span className="bg-orange-600 text-white px-2 py-0.5 rounded mr-1 inline-block">패키지형 관리 마켓플레이스</span>
+              기반<br />
+              이동형 주택수리/홈케어 플랫폼
             </h1>
             <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-8">
-              전문 파트너가 고정 가격으로 방문합니다.<br />
-              추가 비용 없이 투명하게, 품질 보증까지 받으세요.
+              표준화된 패키지 상품을 중심으로 가격·품질·운영을 통제하는<br />
+              관리형 마켓플레이스 기반 이동형 주택수리/홈케어 플랫폼
             </p>
 
             <div className="flex flex-wrap gap-3">
