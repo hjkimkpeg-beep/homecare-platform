@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -11,6 +11,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const navItems = [
     { href: "/admin", label: "대시보드", icon: LayoutDashboard },
     { href: "/admin/orders", label: "주문 관리", icon: ClipboardList },
+    { href: "/admin/booking-lookup", label: "예약 현황 조회", icon: Search },
     { href: "/admin/partners", label: "파트너 관리", icon: Users },
     { href: "/admin/as-requests", label: "A/S 관리", icon: Wrench },
   ];

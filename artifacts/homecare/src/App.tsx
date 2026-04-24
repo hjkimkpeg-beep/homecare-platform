@@ -9,11 +9,13 @@ import NotFound from "@/pages/not-found";
 // Customer Pages
 import Login from "@/pages/login";
 import CustomerHome from "@/pages/customer/home";
+import PackagesPage from "@/pages/customer/packages";
 import PackageDetail from "@/pages/customer/package-detail";
 import BookPackage from "@/pages/customer/book";
 import CustomerOrders from "@/pages/customer/orders";
 import CustomerOrderDetail from "@/pages/customer/order-detail";
 import CustomerAsRequests from "@/pages/customer/as-requests";
+import BookingLookup from "@/pages/customer/booking-lookup";
 
 // Admin Pages
 import AdminLogin from "@/pages/admin/login";
@@ -22,6 +24,7 @@ import AdminOrders from "@/pages/admin/orders";
 import AdminOrderDetail from "@/pages/admin/order-detail";
 import AdminPartners from "@/pages/admin/partners";
 import AdminAsRequests from "@/pages/admin/as-requests";
+import AdminBookingLookup from "@/pages/admin/booking-lookup";
 
 // Partner Pages
 import PartnerLogin from "@/pages/partner/login";
@@ -74,6 +77,10 @@ function Router() {
       <Route path="/">
         {() => <CustomerGuard component={CustomerHome} />}
       </Route>
+      <Route path="/packages">
+        {() => <CustomerGuard component={PackagesPage} />}
+      </Route>
+      <Route path="/booking-lookup" component={BookingLookup} />
       <Route path="/packages/:id">
         {() => <CustomerGuard component={() => <PackageDetail />} />}
       </Route>
@@ -105,6 +112,9 @@ function Router() {
       </Route>
       <Route path="/admin/as-requests">
         {() => <AdminGuard component={AdminAsRequests} />}
+      </Route>
+      <Route path="/admin/booking-lookup">
+        {() => <AdminGuard component={AdminBookingLookup} />}
       </Route>
 
       {/* Partner */}

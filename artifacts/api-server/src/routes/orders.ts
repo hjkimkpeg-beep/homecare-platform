@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte, lte } from "drizzle-orm";
 import {
   db,
   ordersTable,
@@ -122,6 +122,105 @@ router.post("/orders", requireAuth, async (req, res): Promise<void> => {
     requestNote: order.requestNote,
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
+  });
+});
+
+// ─── Public: lookup by phone + orderNumber ───────────────────────────────────
+router.get("/orders/lookup", async (req, res): Promise<void> => {
+  const phone = (req.query.phone as string | undefined)?.trim();
+  const orderNumber = (req.query.orderNumber as string | undefined)?.trim();
+
+  if (!phone || !orderNumber) {
+    res.status(400).json({ error: "전화번호와 예약번호를 모두 입력해주세요" });
+    return;
+  }
+
+  // find customer by phone
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.phone, phone));
+  if (!user) { res.status(404).json({ error: "예약 정보를 찾을 수 없습니다" }); return; }
+
+  const [customer] = await db.select().from(customerProfilesTable).where(eq(customerProfilesTable.userId, user.id));
+  if (!customer) { res.status(404).json({ error: "예약 정보를 찾을 수 없습니다" }); return; }
+
+  const [order] = await db
+    .select()
+    .from(ordersTable)
+    .where(
+      and(
+        eq(ordersTable.customerId, customer.id),
+        eq(ordersTable.orderNumber, orderNumber)
+      )
+    );
+
+  if (!order) { res.status(404).json({ error: "예약 정보를 찾을 수 없습니다" }); return; }
+
+  res.json({
+    id: order.id,
+    orderNumber: order.orderNumber,
+    packageName: order.packageName,
+    status: order.status,
+    totalPrice: order.totalPrice,
+    roadAddress: order.roadAddress,
+    detailAddress: order.detailAddress,
+    scheduledDate: order.scheduledDate,
+    requestNote: order.requestNote,
+    createdAt: order.createdAt,
+  });
+});
+
+// ─── Public: modify booking (with phone+orderNumber verification) ─────────────
+router.patch("/orders/:id/modify", async (req, res): Promise<void> => {
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const { phone, orderNumber, scheduledDate, roadAddress, detailAddress, requestNote } = req.body;
+
+  if (!phone || !orderNumber) {
+    res.status(400).json({ error: "전화번호와 예약번호로 본인 확인이 필요합니다" });
+    return;
+  }
+
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.phone, (phone as string).trim()));
+  if (!user) { res.status(403).json({ error: "본인 확인에 실패했습니다" }); return; }
+
+  const [customer] = await db.select().from(customerProfilesTable).where(eq(customerProfilesTable.userId, user.id));
+  if (!customer) { res.status(403).json({ error: "본인 확인에 실패했습니다" }); return; }
+
+  const [order] = await db.select().from(ordersTable).where(eq(ordersTable.id, id));
+  if (!order) { res.status(404).json({ error: "예약을 찾을 수 없습니다" }); return; }
+
+  if (order.customerId !== customer.id || order.orderNumber !== (orderNumber as string).trim()) {
+    res.status(403).json({ error: "본인 확인에 실패했습니다" });
+    return;
+  }
+
+  const modifiableStatuses = ["pending_assignment", "assigned"];
+  if (!modifiableStatuses.includes(order.status)) {
+    res.status(400).json({ error: "현재 상태에서는 예약을 수정할 수 없습니다" });
+    return;
+  }
+
+  const updateData: Partial<typeof order> = {};
+  if (scheduledDate)  updateData.scheduledDate = new Date(scheduledDate);
+  if (roadAddress)    updateData.roadAddress = roadAddress;
+  if (detailAddress !== undefined) updateData.detailAddress = detailAddress;
+  if (requestNote !== undefined)  updateData.requestNote = requestNote;
+
+  const [updated] = await db
+    .update(ordersTable)
+    .set(updateData)
+    .where(eq(ordersTable.id, id))
+    .returning();
+
+  res.json({
+    id: updated.id,
+    orderNumber: updated.orderNumber,
+    packageName: updated.packageName,
+    status: updated.status,
+    totalPrice: updated.totalPrice,
+    roadAddress: updated.roadAddress,
+    detailAddress: updated.detailAddress,
+    scheduledDate: updated.scheduledDate,
+    requestNote: updated.requestNote,
+    createdAt: updated.createdAt,
   });
 });
 

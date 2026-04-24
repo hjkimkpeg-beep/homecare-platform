@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, desc, count, and, sql } from "drizzle-orm";
+import { eq, desc, count, and, sql, gte, lte, like, ilike } from "drizzle-orm";
 import {
   db,
   ordersTable,
@@ -447,6 +447,99 @@ router.get("/admin/as-requests", requireAdmin, async (req, res): Promise<void> =
       createdAt: r.createdAt,
     })),
   );
+});
+
+// ─── Admin: booking lookup / search ──────────────────────────────────────────
+router.get("/admin/booking-lookup", requireAdmin, async (req, res): Promise<void> => {
+  const { phone, orderNumber, status, dateFrom, dateTo } = req.query as Record<string, string>;
+
+  // Build joined query: orders + customer user
+  const allOrders = await db
+    .select({
+      id: ordersTable.id,
+      orderNumber: ordersTable.orderNumber,
+      packageName: ordersTable.packageName,
+      status: ordersTable.status,
+      totalPrice: ordersTable.totalPrice,
+      roadAddress: ordersTable.roadAddress,
+      detailAddress: ordersTable.detailAddress,
+      scheduledDate: ordersTable.scheduledDate,
+      requestNote: ordersTable.requestNote,
+      createdAt: ordersTable.createdAt,
+      customerId: ordersTable.customerId,
+    })
+    .from(ordersTable)
+    .orderBy(desc(ordersTable.scheduledDate));
+
+  // Filter in application layer for flexibility
+  let filtered = allOrders;
+
+  if (status) filtered = filtered.filter((o) => o.status === status);
+
+  if (dateFrom) {
+    const from = new Date(dateFrom);
+    filtered = filtered.filter((o) => new Date(o.scheduledDate) >= from);
+  }
+  if (dateTo) {
+    const to = new Date(dateTo);
+    to.setHours(23, 59, 59, 999);
+    filtered = filtered.filter((o) => new Date(o.scheduledDate) <= to);
+  }
+  if (orderNumber) {
+    const q = orderNumber.trim().toLowerCase();
+    filtered = filtered.filter((o) => o.orderNumber.toLowerCase().includes(q));
+  }
+
+  // Enrich with customer info
+  const customerIds = [...new Set(filtered.map((o) => o.customerId))];
+  const customerUsers: Record<string, { name: string; phone: string }> = {};
+
+  if (customerIds.length > 0) {
+    const profiles = await db
+      .select({
+        id: customerProfilesTable.id,
+        userId: customerProfilesTable.userId,
+      })
+      .from(customerProfilesTable)
+      .where(
+        customerIds.length === 1
+          ? eq(customerProfilesTable.id, customerIds[0])
+          : sql`${customerProfilesTable.id} = ANY(${customerIds})`
+      );
+
+    const userIds = profiles.map((p) => p.userId);
+    if (userIds.length > 0) {
+      const users = await db
+        .select({ id: usersTable.id, name: usersTable.name, phone: usersTable.phone })
+        .from(usersTable)
+        .where(
+          userIds.length === 1
+            ? eq(usersTable.id, userIds[0])
+            : sql`${usersTable.id} = ANY(${userIds})`
+        );
+
+      const userMap: Record<string, { name: string; phone: string }> = {};
+      users.forEach((u) => { userMap[u.id] = { name: u.name, phone: u.phone }; });
+
+      profiles.forEach((p) => {
+        if (userMap[p.userId]) customerUsers[p.id] = userMap[p.userId];
+      });
+    }
+  }
+
+  // Apply phone filter after enrichment
+  let result = filtered.map((o) => ({
+    ...o,
+    customerName: customerUsers[o.customerId]?.name,
+    customerPhone: customerUsers[o.customerId]?.phone,
+  }));
+
+  if (phone) {
+    const q = phone.trim();
+    result = result.filter((o) => o.customerPhone?.includes(q));
+  }
+
+  res.json({ orders: result });
 });
 
 export default router;
