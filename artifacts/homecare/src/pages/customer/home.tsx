@@ -5,7 +5,6 @@ import { formatCurrency, translateOrderStatus } from "@/lib/format";
 import {
   ChevronRight,
   Clock,
-  ShieldCheck,
   Loader2,
   Zap,
   Heart,
@@ -15,23 +14,23 @@ import {
   Star,
   Users,
   Wrench,
+  Shield,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
-const PACKAGE_THEMES: Record<string, { icon: React.ElementType; gradient: string; accent: string }> = {
-  "90분 퀵픽스":   { icon: Zap,         gradient: "from-blue-500 to-indigo-600",   accent: "bg-blue-50 text-blue-700" },
-  "시니어 안심":   { icon: Heart,        gradient: "from-rose-500 to-pink-600",     accent: "bg-rose-50 text-rose-700" },
-  "에너지 세이브": { icon: Leaf,         gradient: "from-emerald-500 to-teal-600",  accent: "bg-emerald-50 text-emerald-700" },
-  "임대 턴오버":   { icon: KeyRound,     gradient: "from-violet-500 to-purple-600", accent: "bg-violet-50 text-violet-700" },
-  "계절 점검":     { icon: CalendarCheck, gradient: "from-amber-500 to-orange-500",  accent: "bg-amber-50 text-amber-700" },
+const PACKAGE_THEMES: Record<string, { icon: React.ElementType; iconBg: string; iconColor: string }> = {
+  "90분 퀵픽스":   { icon: Zap,          iconBg: "bg-blue-50",    iconColor: "text-blue-500" },
+  "시니어 안심":   { icon: Shield,        iconBg: "bg-green-50",   iconColor: "text-green-500" },
+  "에너지 세이브": { icon: Leaf,          iconBg: "bg-emerald-50", iconColor: "text-emerald-500" },
+  "임대 턴오버":   { icon: KeyRound,      iconBg: "bg-orange-50",  iconColor: "text-orange-500" },
+  "계절 점검":     { icon: CalendarCheck, iconBg: "bg-sky-50",     iconColor: "text-sky-500" },
 };
-
-const DEFAULT_THEME = { icon: Wrench, gradient: "from-gray-500 to-gray-600", accent: "bg-gray-50 text-gray-700" };
+const DEFAULT_THEME = { icon: Wrench, iconBg: "bg-gray-50", iconColor: "text-gray-500" };
 
 const STATS = [
-  { label: "누적 완료", value: "2,400+", icon: Star },
-  { label: "고객 만족", value: "4.9점", icon: Heart },
-  { label: "전문 기사", value: "120명", icon: Users },
+  { label: "고객 만족도", value: "4.8점 평균", icon: Star },
+  { label: "검증된 기술자", value: "전문 파트너", icon: Users },
+  { label: "빠른 서비스", value: "당일 예약", icon: Clock },
 ];
 
 export default function CustomerHome() {
@@ -46,47 +45,84 @@ export default function CustomerHome() {
 
   return (
     <CustomerLayout>
-      {/* Hero */}
-      <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-5 pt-7 pb-10 overflow-hidden">
-        <div className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 1px, transparent 1px)", backgroundSize: "24px 24px" }}
+      {/* Dark Hero */}
+      <section className="bg-[#0f1729] px-6 pt-12 pb-14 relative overflow-hidden">
+        {/* subtle grid overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
         />
-        <div className="relative">
-          <span className="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-medium px-3 py-1 rounded-full mb-3 backdrop-blur-sm">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            전문 교육 이수 매니저 방문
-          </span>
-          <h2 className="text-2xl font-bold text-white leading-tight mb-1">
-            어떤 서비스가<br />필요하신가요?
-          </h2>
-          <p className="text-blue-100 text-sm">당일 예약, 정찰제 가격</p>
-        </div>
-      </div>
 
-      {/* Stats strip */}
-      <div className="mx-4 -mt-5 bg-white rounded-2xl shadow-lg border border-gray-100 px-4 py-3 flex justify-around z-10 relative">
-        {STATS.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="flex flex-col items-center gap-0.5">
-            <div className="flex items-center gap-1">
-              <Icon className="w-3.5 h-3.5 text-primary" />
-              <span className="text-sm font-bold text-gray-900">{value}</span>
+        <div className="relative max-w-2xl">
+          {/* Logo badge */}
+          <div className="inline-flex items-center gap-2 mb-6">
+            <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
+              <KeyRound className="w-4 h-4 text-white" />
             </div>
-            <span className="text-[10px] text-gray-400">{label}</span>
+            <span className="text-blue-400 text-sm font-semibold tracking-wide">HomeCare Platform</span>
           </div>
-        ))}
-      </div>
 
-      <div className="p-4 space-y-4">
-        {/* Active Order Banner */}
-        {!isOrdersLoading && activeOrder && (
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-4">
+            집 수리, 이제<br />
+            <span className="text-blue-400">정가제</span>로 믿고 맡기세요
+          </h1>
+          <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-8 max-w-md">
+            전문 파트너가 고정 가격으로 방문합니다.<br />
+            추가 비용 없이 투명하게, 품질 보증까지 받으세요.
+          </p>
+
+          <div className="flex flex-wrap gap-3">
+            <Link href={user ? "/" : "/login"}>
+              <button
+                className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
+                onClick={(e) => {
+                  if (user) {
+                    e.preventDefault();
+                    document.getElementById("packages-section")?.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                서비스 예약하기
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </Link>
+            <Link href={user ? "/orders" : "/login"}>
+              <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm border border-white/10">
+                예약 현황 조회
+              </button>
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div className="flex flex-wrap gap-6 mt-10 pt-8 border-t border-white/10">
+            {STATS.map(({ label, value, icon: Icon }) => (
+              <div key={label} className="flex items-center gap-2">
+                <Icon className="w-4 h-4 text-blue-400" />
+                <div>
+                  <p className="text-white text-sm font-bold">{value}</p>
+                  <p className="text-gray-500 text-[11px]">{label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Active Order Banner */}
+      {!isOrdersLoading && activeOrder && (
+        <div className="px-4 pt-4">
           <Link href={`/orders/${activeOrder.id}`}>
-            <div className="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-4 flex items-center justify-between shadow-md cursor-pointer">
+            <div className="bg-blue-600 rounded-2xl p-4 flex items-center justify-between shadow-md cursor-pointer">
               <div>
                 <span className="inline-block text-xs font-semibold bg-white/20 text-white px-2 py-0.5 rounded-full mb-1.5">
                   {translateOrderStatus(activeOrder.status)}
                 </span>
                 <p className="font-bold text-white">{activeOrder.packageName}</p>
-                <p className="text-xs text-blue-100 mt-0.5">
+                <p className="text-xs text-blue-200 mt-0.5">
                   {new Date(activeOrder.scheduledDate).toLocaleDateString("ko-KR", {
                     month: "long", day: "numeric", hour: "2-digit", minute: "2-digit",
                   })}
@@ -97,66 +133,56 @@ export default function CustomerHome() {
               </div>
             </div>
           </Link>
-        )}
+        </div>
+      )}
 
-        {/* Section header */}
-        <div className="pt-1">
-          <h3 className="text-base font-bold text-gray-900">서비스 패키지</h3>
-          <p className="text-xs text-gray-400 mt-0.5">투명한 정찰제 · A/S 보증</p>
+      {/* Packages Section */}
+      <section id="packages-section" className="bg-gray-50 px-4 pt-10 pb-6">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-extrabold text-gray-900">서비스 패키지</h2>
+          <p className="text-gray-500 text-sm mt-2">투명한 고정 가격으로 원하는 서비스를 선택하세요</p>
         </div>
 
-        {/* Package Cards */}
         {isPackagesLoading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {packages?.map((pkg) => {
               const theme = PACKAGE_THEMES[pkg.name] ?? DEFAULT_THEME;
               const Icon = theme.icon;
               return (
                 <Link key={pkg.id} href={`/packages/${pkg.id}`}>
                   <div
-                    className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-[0.99] cursor-pointer"
+                    className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer flex flex-col"
                     data-testid={`package-card-${pkg.id}`}
                   >
-                    <div className="flex items-stretch">
-                      {/* Color bar + icon */}
-                      <div className={`bg-gradient-to-b ${theme.gradient} w-1.5 flex-shrink-0`} />
-                      <div className="flex-1 p-4">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.accent}`}>
-                              <Icon className="w-4.5 h-4.5" />
-                            </div>
-                            <div className="min-w-0">
-                              <h3 className="font-bold text-gray-900 text-base leading-tight">{pkg.name}</h3>
-                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{pkg.description}</p>
-                            </div>
-                          </div>
-                          <div className="flex-shrink-0 text-right">
-                            <span className="font-bold text-primary text-base">{formatCurrency(pkg.basePrice)}</span>
-                          </div>
-                        </div>
+                    {/* Icon */}
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${theme.iconBg}`}>
+                      <Icon className={`w-5 h-5 ${theme.iconColor}`} />
+                    </div>
 
-                        <div className="flex items-center gap-3 mt-3 pt-2.5 border-t border-gray-50">
-                          <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>약 {pkg.estimatedMinutes}분</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            <span>A/S {pkg.asWarrantyDays}일 보장</span>
-                          </div>
-                          <div className="ml-auto">
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${theme.accent}`}>
-                              예약하기
-                            </span>
-                          </div>
-                        </div>
+                    {/* Name & desc */}
+                    <h3 className="font-bold text-gray-900 text-base mb-1">{pkg.name}</h3>
+                    <p className="text-gray-500 text-xs leading-relaxed line-clamp-3 flex-1 mb-4">{pkg.description}</p>
+
+                    {/* Price & time */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-xl font-extrabold text-gray-900">
+                        {pkg.basePrice.toLocaleString("ko-KR")}
+                        <span className="text-sm font-semibold text-gray-500 ml-0.5">원</span>
+                      </span>
+                      <div className="flex items-center gap-1 text-gray-400 text-xs">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{pkg.estimatedMinutes}분</span>
                       </div>
                     </div>
+
+                    {/* CTA */}
+                    <button className="w-full bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors">
+                      예약하기
+                    </button>
                   </div>
                 </Link>
               );
@@ -164,11 +190,10 @@ export default function CustomerHome() {
           </div>
         )}
 
-        {/* Footer note */}
-        <p className="text-center text-[11px] text-gray-300 pb-2">
+        <p className="text-center text-[11px] text-gray-300 mt-8">
           모든 서비스는 배상책임보험이 적용됩니다
         </p>
-      </div>
+      </section>
     </CustomerLayout>
   );
 }
