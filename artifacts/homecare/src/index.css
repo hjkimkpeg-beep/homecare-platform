@@ -165,10 +165,26 @@
   }
 }
 
-/* 대형 화면 폰트 비례 확대 */
+/* ─── 전역 폰트 스케일 ─────────────────────────────────────
+   기본 해상도(~1535px): 20px  → 125%
+   중형  (1536–1919px): 25px  → 156.25%
+   대형  (1920px+):     30px  → 187.5%
+──────────────────────────────────────────────────────────── */
+html { font-size: 125%; }                  /* ~1535px : 20px */
 @media (min-width: 1536px) {
-  html { font-size: 112.5%; } /* 16px → 18px */
+  html { font-size: 156.25%; }             /* 1536–1919px : 25px */
 }
 @media (min-width: 1920px) {
-  html { font-size: 137.5%; } /* 16px → 22px */
+  html { font-size: 187.5%; }             /* 1920px+ : 30px */
+}
+
+/* ─── 히어로 제목 고정 px (전역 rem 스케일과 독립) ──────────
+   ~1535px : 48px  /  1536–1919px : 54px  /  1920px+ : 60px
+──────────────────────────────────────────────────────────── */
+.hero-heading                     { font-size: 48px; }
+@media (min-width: 1536px) {
+  .hero-heading                   { font-size: 54px; }
+}
+@media (min-width: 1920px) {
+  .hero-heading                   { font-size: 60px; }
 }

@@ -59,7 +59,7 @@ export default function CustomerHome() {
               <span className="text-blue-400 text-sm 2xl:text-lg font-semibold tracking-wide">HomeCare Platform</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl xl:text-5xl 2xl:text-5xl font-extrabold text-white leading-tight mb-6 2xl:mb-10">
+            <h1 className="hero-heading font-extrabold text-white leading-tight mb-6 2xl:mb-10">
               집 수리, 이제<br />
               <span className="text-blue-400">정가제</span>로 믿고 맡기세요
             </h1>
