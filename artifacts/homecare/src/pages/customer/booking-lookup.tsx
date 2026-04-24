@@ -120,7 +120,7 @@ export default function BookingLookup() {
   return (
     <CustomerLayout>
       <div className="min-h-[calc(100dvh-56px)] bg-gray-50 px-4 py-10">
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-xl 2xl:max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
               <Search className="w-6 h-6 text-white" />

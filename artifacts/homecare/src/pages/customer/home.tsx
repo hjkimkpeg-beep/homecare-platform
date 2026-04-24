@@ -59,24 +59,24 @@ export default function CustomerHome() {
               <span className="text-blue-400 text-sm 2xl:text-lg font-semibold tracking-wide">HomeCare Platform</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold text-white leading-tight mb-6 2xl:mb-10">
+            <h1 className="text-4xl sm:text-5xl xl:text-6xl 2xl:text-6xl font-extrabold text-white leading-tight mb-6 2xl:mb-10">
               집 수리, 이제<br />
               <span className="text-blue-400">정가제</span>로 믿고 맡기세요
             </h1>
-            <p className="text-gray-400 text-base sm:text-lg 2xl:text-2xl leading-relaxed mb-10 2xl:mb-14">
+            <p className="text-gray-400 text-base sm:text-lg 2xl:text-xl leading-relaxed mb-10 2xl:mb-14">
               전문 파트너가 고정 가격으로 방문합니다.<br />
               추가 비용 없이 투명하게, 품질 보증까지 받으세요.
             </p>
 
             <div className="flex flex-wrap gap-4 2xl:gap-6">
               <Link href="/packages">
-                <button className="flex items-center gap-2 2xl:gap-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 2xl:px-12 2xl:py-5 rounded-xl 2xl:rounded-2xl transition-colors text-base 2xl:text-xl shadow-lg shadow-blue-500/30">
+                <button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 2xl:px-10 2xl:py-5 rounded-xl transition-colors text-base 2xl:text-lg shadow-lg shadow-blue-500/30">
                   서비스 예약하기
-                  <ChevronRight className="w-5 h-5 2xl:w-6 2xl:h-6" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </Link>
               <Link href="/booking-lookup">
-                <button className="flex items-center gap-2 2xl:gap-3 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 2xl:px-12 2xl:py-5 rounded-xl 2xl:rounded-2xl transition-colors text-base 2xl:text-xl border border-white/20">
+                <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 2xl:px-10 2xl:py-5 rounded-xl transition-colors text-base 2xl:text-lg border border-white/20">
                   예약 현황 조회
                 </button>
               </Link>

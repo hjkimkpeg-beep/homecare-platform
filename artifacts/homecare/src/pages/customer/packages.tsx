@@ -69,17 +69,17 @@ export default function PackagesPage() {
                     <p className="text-gray-500 text-xs 2xl:text-sm leading-relaxed flex-1 mb-5 2xl:mb-8">{pkg.description}</p>
                     <div className="flex items-end justify-between mb-4 2xl:mb-6">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-2xl 2xl:text-4xl font-extrabold text-gray-900">
+                        <span className="text-2xl 2xl:text-3xl font-extrabold text-gray-900">
                           {pkg.basePrice.toLocaleString("ko-KR")}
                         </span>
-                        <span className="text-sm 2xl:text-base font-medium text-gray-500">원</span>
+                        <span className="text-sm font-medium text-gray-500">원</span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-400 text-xs 2xl:text-sm">
-                        <Clock className="w-3.5 h-3.5 2xl:w-4 2xl:h-4" />
+                        <Clock className="w-3.5 h-3.5" />
                         <span>{pkg.estimatedMinutes}분</span>
                       </div>
                     </div>
-                    <button className="w-full bg-[#111827] hover:bg-gray-700 text-white text-sm 2xl:text-base font-semibold py-3 2xl:py-4 rounded-xl 2xl:rounded-2xl transition-colors">
+                    <button className="w-full bg-[#111827] hover:bg-gray-700 text-white text-sm 2xl:text-base font-semibold py-3 2xl:py-4 rounded-xl transition-colors">
                       예약하기
                     </button>
                   </div>
