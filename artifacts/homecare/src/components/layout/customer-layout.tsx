@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Home, ClipboardList, Wrench, KeyRound } from "lucide-react";
+import { ChatbotWidget } from "@/components/ChatbotWidget";
 
 export function CustomerLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -66,6 +67,7 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
 
       <main className="flex-1 overflow-y-auto pb-20">
         {children}
+        <ChatbotWidget />
       </main>
 
       {/* Mobile bottom nav */}

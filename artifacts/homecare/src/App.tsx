@@ -25,6 +25,7 @@ import AdminOrderDetail from "@/pages/admin/order-detail";
 import AdminPartners from "@/pages/admin/partners";
 import AdminAsRequests from "@/pages/admin/as-requests";
 import AdminBookingLookup from "@/pages/admin/booking-lookup";
+import AdminMarketing from "@/pages/admin/marketing";
 
 // Partner Pages
 import PartnerLogin from "@/pages/partner/login";
@@ -115,6 +116,9 @@ function Router() {
       </Route>
       <Route path="/admin/booking-lookup">
         {() => <AdminGuard component={AdminBookingLookup} />}
+      </Route>
+      <Route path="/admin/marketing">
+        {() => <AdminGuard component={AdminMarketing} />}
       </Route>
 
       {/* Partner */}

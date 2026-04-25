@@ -6,6 +6,7 @@ import ordersRouter from "./orders";
 import adminRouter from "./admin";
 import reviewsRouter from "./reviews";
 import partnerRouter from "./partner";
+import openaiRouter from "./openai";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(ordersRouter);
 router.use(adminRouter);
 router.use(reviewsRouter);
 router.use(partnerRouter);
+router.use(openaiRouter);
 
 export default router;

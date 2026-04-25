@@ -308,6 +308,43 @@ export interface AsRequest {
   createdAt: string;
 }
 
+export interface OpenaiConversation {
+  id: number;
+  title: string;
+  createdAt: string;
+}
+
+export interface OpenaiMessage {
+  id: number;
+  conversationId: number;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface OpenaiConversationWithMessages {
+  id: number;
+  title: string;
+  createdAt: string;
+  messages: OpenaiMessage[];
+}
+
+export interface CreateOpenaiConversationBody {
+  title: string;
+}
+
+export interface SendOpenaiMessageBody {
+  content: string;
+}
+
+export interface GenerateMarketingCopyBody {
+  packageName?: string | null;
+  targetAudience: string;
+  channel: string;
+  tone: string;
+  additionalContext?: string | null;
+}
+
 export type ListOrdersParams = {
   status?: string;
 };
