@@ -2,6 +2,7 @@ import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Link } from "wouter";
 import { ChevronRight, Clock, Star, Users, KeyRound, Shield, Wrench } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { ShareButtons } from "@/components/share-buttons";
 
 const HERO_STATS = [
   { label: "고객 만족도", value: "4.8점 평균", icon: Star },
@@ -80,6 +81,14 @@ export default function CustomerHome() {
                   예약 현황 조회
                 </button>
               </Link>
+            </div>
+
+            <div className="mt-6 2xl:mt-8">
+              <ShareButtons
+                title="HomeCare – 집 수리, 정가제로 믿고 맡기세요"
+                description="전문 파트너가 고정 가격으로 방문합니다. 추가 비용 없이 투명하게!"
+                label="친구에게 알리기"
+              />
             </div>
 
             <div className="flex flex-wrap gap-8 2xl:gap-14 mt-12 2xl:mt-16 pt-10 2xl:pt-12 border-t border-white/10">

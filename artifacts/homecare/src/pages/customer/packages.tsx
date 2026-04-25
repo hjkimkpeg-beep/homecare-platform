@@ -1,7 +1,9 @@
 import { useListPackages } from "@workspace/api-client-react";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Link } from "wouter";
-import { Clock, Loader2, Zap, Leaf, CalendarCheck, Shield, Wrench, Star, Home } from "lucide-react";
+import { Clock, Loader2, Zap, Leaf, CalendarCheck, Shield, Wrench, Star, Home, Share2 } from "lucide-react";
+import { ShareButtons } from "@/components/share-buttons";
+import { useState } from "react";
 
 const PACKAGE_THEMES: Record<string, { icon: React.ElementType; iconBg: string; iconColor: string }> = {
   "90분 퀵픽스":   { icon: Zap,          iconBg: "bg-blue-50",    iconColor: "text-blue-500" },
@@ -36,6 +38,33 @@ const TRUST_ITEMS = [
   },
 ];
 
+function PackageShareToggle({ pkgId, pkgName }: { pkgId: string; pkgName: string }) {
+  const [open, setOpen] = useState(false);
+  const pkgUrl = `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, "")}/packages/${pkgId}`;
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+      >
+        <Share2 className="w-3.5 h-3.5" />
+        {open ? "닫기" : "공유"}
+      </button>
+      {open && (
+        <div className="mt-2 pt-2 border-t border-gray-100">
+          <ShareButtons
+            title={`HomeCare – ${pkgName}`}
+            description="전문 파트너가 고정 가격으로 방문합니다. 추가 비용 없이 투명하게!"
+            url={pkgUrl}
+            label=""
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PackagesPage() {
   const { data: packages, isLoading } = useListPackages();
 
@@ -57,33 +86,38 @@ export default function PackagesPage() {
               const theme = PACKAGE_THEMES[pkg.name] ?? DEFAULT_THEME;
               const Icon = theme.icon;
               return (
-                <Link key={pkg.id} href={`/packages/${pkg.id}`}>
-                  <div
-                    className="bg-white rounded-2xl 2xl:rounded-3xl p-5 2xl:p-8 border border-gray-100 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
-                    data-testid={`package-card-${pkg.id}`}
-                  >
-                    <div className={`w-11 h-11 2xl:w-16 2xl:h-16 rounded-xl 2xl:rounded-2xl flex items-center justify-center mb-4 2xl:mb-6 ${theme.iconBg}`}>
-                      <Icon className={`w-5 h-5 2xl:w-8 2xl:h-8 ${theme.iconColor}`} />
-                    </div>
-                    <h3 className="font-bold text-gray-900 text-base 2xl:text-xl mb-2 2xl:mb-3">{pkg.name}</h3>
-                    <p className="text-gray-500 text-xs 2xl:text-sm leading-relaxed flex-1 mb-5 2xl:mb-8">{pkg.description}</p>
-                    <div className="flex items-end justify-between mb-4 2xl:mb-6">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-2xl 2xl:text-3xl font-extrabold text-gray-900">
-                          {pkg.basePrice.toLocaleString("ko-KR")}
-                        </span>
-                        <span className="text-sm font-medium text-gray-500">원</span>
+                <div key={pkg.id} className="flex flex-col gap-2">
+                  <Link href={`/packages/${pkg.id}`}>
+                    <div
+                      className="bg-white rounded-2xl 2xl:rounded-3xl p-5 2xl:p-8 border border-gray-100 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
+                      data-testid={`package-card-${pkg.id}`}
+                    >
+                      <div className={`w-11 h-11 2xl:w-16 2xl:h-16 rounded-xl 2xl:rounded-2xl flex items-center justify-center mb-4 2xl:mb-6 ${theme.iconBg}`}>
+                        <Icon className={`w-5 h-5 2xl:w-8 2xl:h-8 ${theme.iconColor}`} />
                       </div>
-                      <div className="flex items-center gap-1 text-gray-400 text-xs 2xl:text-sm">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{pkg.estimatedMinutes}분</span>
+                      <h3 className="font-bold text-gray-900 text-base 2xl:text-xl mb-2 2xl:mb-3">{pkg.name}</h3>
+                      <p className="text-gray-500 text-xs 2xl:text-sm leading-relaxed flex-1 mb-5 2xl:mb-8">{pkg.description}</p>
+                      <div className="flex items-end justify-between mb-4 2xl:mb-6">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-2xl 2xl:text-3xl font-extrabold text-gray-900">
+                            {pkg.basePrice.toLocaleString("ko-KR")}
+                          </span>
+                          <span className="text-sm font-medium text-gray-500">원</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-gray-400 text-xs 2xl:text-sm">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{pkg.estimatedMinutes}분</span>
+                        </div>
                       </div>
+                      <button className="w-full bg-[#111827] hover:bg-gray-700 text-white text-sm 2xl:text-base font-semibold py-3 2xl:py-4 rounded-xl transition-colors">
+                        예약하기
+                      </button>
                     </div>
-                    <button className="w-full bg-[#111827] hover:bg-gray-700 text-white text-sm 2xl:text-base font-semibold py-3 2xl:py-4 rounded-xl transition-colors">
-                      예약하기
-                    </button>
+                  </Link>
+                  <div className="px-1">
+                    <PackageShareToggle pkgId={pkg.id} pkgName={pkg.name} />
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

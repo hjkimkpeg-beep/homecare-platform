@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { formatCurrency, getOrderStatusColor, translateOrderStatus } from "@/lib/format";
 import { Loader2, MapPin, Calendar, CheckCircle2, Circle, AlertCircle } from "lucide-react";
+import { ShareButtons } from "@/components/share-buttons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -208,6 +209,19 @@ export default function OrderDetail() {
                 </Button>
               </div>
             )}
+
+            {/* Share Section */}
+            <div className="pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-500 mb-3">
+                {isCompleted ? "서비스 완료! 지인에게 HomeCare를 추천해보세요 😊" : "HomeCare를 지인에게 공유해보세요"}
+              </p>
+              <ShareButtons
+                title="HomeCare – 집 수리, 정가제로 믿고 맡기세요"
+                description="전문 파트너가 고정 가격으로 방문합니다. 추가 비용 없이 투명하게!"
+                url={`${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, "")}`}
+                label="공유하기"
+              />
+            </div>
           </div>
         </div>
       </div>
