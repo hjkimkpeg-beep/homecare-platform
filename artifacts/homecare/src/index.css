@@ -165,26 +165,18 @@
   }
 }
 
-/* ─── 전역 폰트 스케일 ─────────────────────────────────────
-   기본 해상도(~1535px): 20px  → 125%
-   중형  (1536–1919px): 25px  → 156.25%
-   대형  (1920px+):     30px  → 187.5%
+/* ─── 전역 폰트: 뷰포트 너비에 따라 선형 연속 스케일 ─────────
+   1024px → 16px (기본)   /   1920px → 30px (최대)
+   공식: clamp(16px, 1.5625vw, 30px)
+   예)  1280px ≈ 20px  |  1440px ≈ 22.5px  |  1536px ≈ 24px
 ──────────────────────────────────────────────────────────── */
-html { font-size: 125%; }                  /* ~1535px : 20px */
-@media (min-width: 1536px) {
-  html { font-size: 156.25%; }             /* 1536–1919px : 25px */
-}
-@media (min-width: 1920px) {
-  html { font-size: 187.5%; }             /* 1920px+ : 30px */
+html {
+  font-size: clamp(1rem, 1.5625vw, 1.875rem);
 }
 
-/* ─── 히어로 제목 고정 px (전역 rem 스케일과 독립) ──────────
-   ~1535px : 48px  /  1536–1919px : 54px  /  1920px+ : 60px
+/* ─── 히어로 제목: rem 스케일과 독립된 고정 vw 기반 크기 ────
+   1024px → 48px  /  1920px → 60px  (2줄 항상 유지)
 ──────────────────────────────────────────────────────────── */
-.hero-heading                     { font-size: 48px; }
-@media (min-width: 1536px) {
-  .hero-heading                   { font-size: 54px; }
-}
-@media (min-width: 1920px) {
-  .hero-heading                   { font-size: 60px; }
+.hero-heading {
+  font-size: clamp(48px, 1.25vw + 35.2px, 60px);
 }
