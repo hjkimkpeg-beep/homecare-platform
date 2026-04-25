@@ -3,7 +3,7 @@ import { useGetOrder, getGetOrderQueryKey, useCancelOrder } from "@workspace/api
 import { useQueryClient } from "@tanstack/react-query";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { formatCurrency, getOrderStatusColor, translateOrderStatus } from "@/lib/format";
-import { Loader2, MapPin, Calendar, CheckCircle2, Circle, AlertCircle } from "lucide-react";
+import { Loader2, MapPin, Calendar, CheckCircle2, Circle, AlertCircle, CreditCard, Banknote } from "lucide-react";
 import { ShareButtons } from "@/components/share-buttons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -161,15 +161,56 @@ export default function OrderDetail() {
           {/* Payment Info */}
           <section className="space-y-4">
             <h2 className="font-bold text-gray-900">결제 정보</h2>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex justify-between items-center text-sm mb-2">
+            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+              <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500">서비스 금액</span>
                 <span className="font-medium">{formatCurrency(order.totalPrice)}</span>
               </div>
-              <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between items-center">
+
+              {order.paymentMethod && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">결제 수단</span>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                    order.paymentMethod === "card"
+                      ? "bg-blue-50 text-blue-700"
+                      : "bg-green-50 text-green-700"
+                  }`}>
+                    {order.paymentMethod === "card"
+                      ? <><CreditCard className="w-3 h-3" /> 카드 결제</>
+                      : <><Banknote className="w-3 h-3" /> 현금 결제</>
+                    }
+                  </span>
+                </div>
+              )}
+
+              <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
                 <span className="font-bold text-gray-900">총 결제금액</span>
                 <span className="font-bold text-primary text-lg">{formatCurrency(order.totalPrice)}</span>
               </div>
+
+              {order.paymentMethod === "card" && order.status === "cancelled" && (
+                <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <p className="text-xs text-blue-700 font-medium">카드 환불 안내</p>
+                  <p className="text-xs text-blue-600 mt-0.5">취소 처리 후 3~5 영업일 이내 카드사를 통해 자동 환불됩니다.</p>
+                </div>
+              )}
+
+              {order.paymentMethod === "cash" && order.refundBankName && (
+                <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-100 space-y-1.5">
+                  <p className="text-xs text-green-700 font-semibold">환불 계좌 정보</p>
+                  <div className="grid grid-cols-2 gap-1 text-xs text-green-700">
+                    <span className="text-green-500">은행</span>
+                    <span className="font-medium">{order.refundBankName}</span>
+                    <span className="text-green-500">계좌번호</span>
+                    <span className="font-medium">{order.refundAccountNumber}</span>
+                    <span className="text-green-500">예금주</span>
+                    <span className="font-medium">{order.refundAccountHolder}</span>
+                  </div>
+                  {order.status === "cancelled" && (
+                    <p className="text-xs text-green-600 pt-1 border-t border-green-200">취소 확인 후 1~3 영업일 이내 위 계좌로 환불됩니다.</p>
+                  )}
+                </div>
+              )}
             </div>
           </section>
 

@@ -55,6 +55,10 @@ router.get("/orders", requireAuth, async (req, res): Promise<void> => {
     detailAddress: o.detailAddress,
     scheduledDate: o.scheduledDate,
     requestNote: o.requestNote,
+    paymentMethod: o.paymentMethod,
+    refundBankName: o.refundBankName,
+    refundAccountNumber: o.refundAccountNumber,
+    refundAccountHolder: o.refundAccountHolder,
     createdAt: o.createdAt,
     updatedAt: o.updatedAt,
   })));
@@ -67,9 +71,22 @@ router.post("/orders", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  const { packageId, roadAddress, detailAddress, scheduledDate, requestNote } = req.body;
+  const {
+    packageId, roadAddress, detailAddress, scheduledDate, requestNote,
+    paymentMethod, refundBankName, refundAccountNumber, refundAccountHolder,
+  } = req.body;
   if (!packageId || !roadAddress || !detailAddress || !scheduledDate) {
     res.status(400).json({ error: "필수 항목을 입력해주세요" });
+    return;
+  }
+
+  if (paymentMethod && !["cash", "card"].includes(paymentMethod)) {
+    res.status(400).json({ error: "결제 수단이 올바르지 않습니다" });
+    return;
+  }
+
+  if (paymentMethod === "cash" && (!refundBankName || !refundAccountNumber || !refundAccountHolder)) {
+    res.status(400).json({ error: "현금 결제 시 환불 계좌 정보를 입력해주세요" });
     return;
   }
 
@@ -98,13 +115,17 @@ router.post("/orders", requireAuth, async (req, res): Promise<void> => {
       detailAddress,
       scheduledDate: new Date(scheduledDate),
       requestNote: requestNote || null,
+      paymentMethod: paymentMethod || null,
+      refundBankName: paymentMethod === "cash" ? (refundBankName || null) : null,
+      refundAccountNumber: paymentMethod === "cash" ? (refundAccountNumber || null) : null,
+      refundAccountHolder: paymentMethod === "cash" ? (refundAccountHolder || null) : null,
     })
     .returning();
 
   await db.insert(orderStatusLogsTable).values({
     orderId: order.id,
     status: "pending_assignment",
-    note: "예약이 접수되었습니다",
+    note: `예약이 접수되었습니다 (${paymentMethod === "card" ? "카드 결제" : paymentMethod === "cash" ? "현금 결제" : "결제 미선택"})`,
     createdBy: req.session.userId,
   });
 
@@ -120,6 +141,10 @@ router.post("/orders", requireAuth, async (req, res): Promise<void> => {
     detailAddress: order.detailAddress,
     scheduledDate: order.scheduledDate,
     requestNote: order.requestNote,
+    paymentMethod: order.paymentMethod,
+    refundBankName: order.refundBankName,
+    refundAccountNumber: order.refundAccountNumber,
+    refundAccountHolder: order.refundAccountHolder,
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
   });
@@ -282,6 +307,10 @@ router.get("/orders/:id", requireAuth, async (req, res): Promise<void> => {
     detailAddress: order.detailAddress,
     scheduledDate: order.scheduledDate,
     requestNote: order.requestNote,
+    paymentMethod: order.paymentMethod,
+    refundBankName: order.refundBankName,
+    refundAccountNumber: order.refundAccountNumber,
+    refundAccountHolder: order.refundAccountHolder,
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
     statusLogs: statusLogs.map((l) => ({
@@ -366,6 +395,10 @@ router.post("/orders/:id/cancel", requireAuth, async (req, res): Promise<void> =
     detailAddress: updated.detailAddress,
     scheduledDate: updated.scheduledDate,
     requestNote: updated.requestNote,
+    paymentMethod: updated.paymentMethod,
+    refundBankName: updated.refundBankName,
+    refundAccountNumber: updated.refundAccountNumber,
+    refundAccountHolder: updated.refundAccountHolder,
     createdAt: updated.createdAt,
     updatedAt: updated.updatedAt,
   });

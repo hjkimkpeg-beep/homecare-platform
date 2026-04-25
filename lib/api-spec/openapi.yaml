@@ -556,6 +556,12 @@ components:
             - excludedItems
             - tasks
 
+    PaymentMethod:
+      type: string
+      enum:
+        - cash
+        - card
+
     CreateOrderBody:
       type: object
       properties:
@@ -569,6 +575,18 @@ components:
           type: string
           format: date-time
         requestNote:
+          type: string
+          nullable: true
+        paymentMethod:
+          $ref: "#/components/schemas/PaymentMethod"
+          nullable: true
+        refundBankName:
+          type: string
+          nullable: true
+        refundAccountNumber:
+          type: string
+          nullable: true
+        refundAccountHolder:
           type: string
           nullable: true
       required:
@@ -615,6 +633,18 @@ components:
           type: string
           format: date-time
         requestNote:
+          type: string
+          nullable: true
+        paymentMethod:
+          $ref: "#/components/schemas/PaymentMethod"
+          nullable: true
+        refundBankName:
+          type: string
+          nullable: true
+        refundAccountNumber:
+          type: string
+          nullable: true
+        refundAccountHolder:
           type: string
           nullable: true
         createdAt:

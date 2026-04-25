@@ -4,6 +4,8 @@ import { z } from "zod/v4";
 import { servicePackagesTable } from "./packages";
 import { customerProfilesTable } from "./customers";
 
+export const paymentMethodEnum = pgEnum("payment_method", ["cash", "card"]);
+
 export const orderStatusEnum = pgEnum("order_status", [
   "requested",
   "paid",
@@ -31,6 +33,10 @@ export const ordersTable = pgTable("orders", {
   detailAddress: varchar("detail_address", { length: 255 }).notNull(),
   scheduledDate: timestamp("scheduled_date", { withTimezone: true }).notNull(),
   requestNote: text("request_note"),
+  paymentMethod: paymentMethodEnum("payment_method"),
+  refundBankName: varchar("refund_bank_name", { length: 50 }),
+  refundAccountNumber: varchar("refund_account_number", { length: 30 }),
+  refundAccountHolder: varchar("refund_account_holder", { length: 50 }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

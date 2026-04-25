@@ -65,12 +65,23 @@ export type ServicePackageDetail = ServicePackage & {
   tasks: string[];
 };
 
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
+
+export const PaymentMethod = {
+  cash: "cash",
+  card: "card",
+} as const;
+
 export interface CreateOrderBody {
   packageId: string;
   roadAddress: string;
   detailAddress: string;
   scheduledDate: string;
   requestNote?: string | null;
+  paymentMethod?: PaymentMethod | null;
+  refundBankName?: string | null;
+  refundAccountNumber?: string | null;
+  refundAccountHolder?: string | null;
 }
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
@@ -102,6 +113,10 @@ export interface Order {
   detailAddress: string;
   scheduledDate: string;
   requestNote?: string | null;
+  paymentMethod?: PaymentMethod | null;
+  refundBankName?: string | null;
+  refundAccountNumber?: string | null;
+  refundAccountHolder?: string | null;
   createdAt: string;
   updatedAt: string;
 }

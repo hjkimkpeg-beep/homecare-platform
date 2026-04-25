@@ -74,6 +74,14 @@ lib/
 - users, customer_profiles, customer_addresses
 - partner_profiles
 - service_packages, package_included_items, package_excluded_items, package_tasks
-- orders, order_status_logs
+- orders (payment_method enum: cash|card, refund_bank_name, refund_account_number, refund_account_holder), order_status_logs
 - job_assignments
 - reviews, as_requests
+
+## Payment Module
+
+- 결제 수단: 카드(card) / 현금(cash) 선택
+- 현금 결제 시 환불 계좌 정보(은행명·계좌번호·예금주) 필수 입력
+- 예약 취소 시: 카드는 카드사 자동 환불 안내, 현금은 입력된 계좌로 환불 안내
+- orders 테이블 컬럼: payment_method, refund_bank_name, refund_account_number, refund_account_holder
+- api-zod index.ts는 generated/api.ts 하나만 export (api.schemas 없음)
