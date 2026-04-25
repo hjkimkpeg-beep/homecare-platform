@@ -345,6 +345,40 @@ export interface GenerateMarketingCopyBody {
   additionalContext?: string | null;
 }
 
+export interface UploadUrlRequest {
+  name: string;
+  size: number;
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+}
+
+export interface ServiceManual {
+  id: number;
+  packageId: string;
+  title: string;
+  description?: string | null;
+  fileType: string;
+  objectPath: string;
+  originalName: string;
+  fileSize?: number | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface CreateServiceManualBody {
+  title: string;
+  description?: string | null;
+  fileType: string;
+  objectPath: string;
+  originalName: string;
+  fileSize?: number | null;
+  sortOrder?: number;
+}
+
 export type ListOrdersParams = {
   status?: string;
 };

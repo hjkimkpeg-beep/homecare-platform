@@ -7,3 +7,4 @@ export * from "./assignments";
 export * from "./reviews";
 export * from "./conversations";
 export * from "./messages";
+export * from "./service-manuals";

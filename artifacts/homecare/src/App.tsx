@@ -33,6 +33,8 @@ import PartnerRegister from "@/pages/partner/register";
 import PartnerJobs from "@/pages/partner/jobs";
 import PartnerJobDetail from "@/pages/partner/job-detail";
 import PartnerHistory from "@/pages/partner/history";
+import PartnerManuals from "@/pages/partner/manuals";
+import AdminManuals from "@/pages/admin/manuals";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -120,6 +122,9 @@ function Router() {
       <Route path="/admin/marketing">
         {() => <AdminGuard component={AdminMarketing} />}
       </Route>
+      <Route path="/admin/manuals">
+        {() => <AdminGuard component={AdminManuals} />}
+      </Route>
 
       {/* Partner */}
       <Route path="/partner/jobs">
@@ -130,6 +135,9 @@ function Router() {
       </Route>
       <Route path="/partner/history">
         {() => <PartnerGuard component={PartnerHistory} />}
+      </Route>
+      <Route path="/partner/manuals">
+        {() => <PartnerGuard component={PartnerManuals} />}
       </Route>
 
       <Route component={NotFound} />

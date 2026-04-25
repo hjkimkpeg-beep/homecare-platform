@@ -31,6 +31,7 @@ import type {
   CreateOpenaiConversationBody,
   CreateOrderBody,
   CreateReviewBody,
+  CreateServiceManualBody,
   GenerateMarketingCopyBody,
   HealthStatus,
   JobAssignment,
@@ -44,9 +45,12 @@ import type {
   PartnerProfile,
   Review,
   SendOpenaiMessageBody,
+  ServiceManual,
   ServicePackage,
   ServicePackageDetail,
   UpdateOrderStatusBody,
+  UploadUrlRequest,
+  UploadUrlResponse,
   User,
 } from "./api.schemas";
 
@@ -2361,4 +2365,439 @@ export const useGenerateMarketingCopy = <
   TContext
 > => {
   return useMutation(getGenerateMarketingCopyMutationOptions(options));
+};
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const getRequestUploadUrlUrl = () => {
+  return `/api/storage/uploads/request-url`;
+};
+
+export const requestUploadUrl = async (
+  uploadUrlRequest: UploadUrlRequest,
+  options?: RequestInit,
+): Promise<UploadUrlResponse> => {
+  return customFetch<UploadUrlResponse>(getRequestUploadUrlUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(uploadUrlRequest),
+  });
+};
+
+export const getRequestUploadUrlMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    TError,
+    { data: BodyType<UploadUrlRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestUploadUrl>>,
+  TError,
+  { data: BodyType<UploadUrlRequest> },
+  TContext
+> => {
+  const mutationKey = ["requestUploadUrl"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    { data: BodyType<UploadUrlRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestUploadUrl(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestUploadUrlMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestUploadUrl>>
+>;
+export type RequestUploadUrlMutationBody = BodyType<UploadUrlRequest>;
+export type RequestUploadUrlMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const useRequestUploadUrl = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    TError,
+    { data: BodyType<UploadUrlRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof requestUploadUrl>>,
+  TError,
+  { data: BodyType<UploadUrlRequest> },
+  TContext
+> => {
+  return useMutation(getRequestUploadUrlMutationOptions(options));
+};
+
+/**
+ * @summary Serve an uploaded object
+ */
+export const getGetObjectUrl = (objectPath: string) => {
+  return `/api/storage/objects/${objectPath}`;
+};
+
+export const getObject = async (
+  objectPath: string,
+  options?: RequestInit,
+): Promise<Blob> => {
+  return customFetch<Blob>(getGetObjectUrl(objectPath), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetObjectQueryKey = (objectPath: string) => {
+  return [`/api/storage/objects/${objectPath}`] as const;
+};
+
+export const getGetObjectQueryOptions = <
+  TData = Awaited<ReturnType<typeof getObject>>,
+  TError = ErrorType<unknown>,
+>(
+  objectPath: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getObject>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetObjectQueryKey(objectPath);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getObject>>> = ({
+    signal,
+  }) => getObject(objectPath, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!objectPath,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getObject>>, TError, TData> & {
+    queryKey: QueryKey;
+  };
+};
+
+export type GetObjectQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getObject>>
+>;
+export type GetObjectQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Serve an uploaded object
+ */
+
+export function useGetObject<
+  TData = Awaited<ReturnType<typeof getObject>>,
+  TError = ErrorType<unknown>,
+>(
+  objectPath: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getObject>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetObjectQueryOptions(objectPath, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary List manuals for a package
+ */
+export const getListServiceManualsUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/manuals`;
+};
+
+export const listServiceManuals = async (
+  packageId: string,
+  options?: RequestInit,
+): Promise<ServiceManual[]> => {
+  return customFetch<ServiceManual[]>(getListServiceManualsUrl(packageId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListServiceManualsQueryKey = (packageId: string) => {
+  return [`/api/packages/${packageId}/manuals`] as const;
+};
+
+export const getListServiceManualsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listServiceManuals>>,
+  TError = ErrorType<unknown>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listServiceManuals>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListServiceManualsQueryKey(packageId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listServiceManuals>>
+  > = ({ signal }) =>
+    listServiceManuals(packageId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!packageId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listServiceManuals>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListServiceManualsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listServiceManuals>>
+>;
+export type ListServiceManualsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List manuals for a package
+ */
+
+export function useListServiceManuals<
+  TData = Awaited<ReturnType<typeof listServiceManuals>>,
+  TError = ErrorType<unknown>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listServiceManuals>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListServiceManualsQueryOptions(packageId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Register a new manual for a package
+ */
+export const getCreateServiceManualUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/manuals`;
+};
+
+export const createServiceManual = async (
+  packageId: string,
+  createServiceManualBody: CreateServiceManualBody,
+  options?: RequestInit,
+): Promise<ServiceManual> => {
+  return customFetch<ServiceManual>(getCreateServiceManualUrl(packageId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createServiceManualBody),
+  });
+};
+
+export const getCreateServiceManualMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createServiceManual>>,
+    TError,
+    { packageId: string; data: BodyType<CreateServiceManualBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createServiceManual>>,
+  TError,
+  { packageId: string; data: BodyType<CreateServiceManualBody> },
+  TContext
+> => {
+  const mutationKey = ["createServiceManual"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createServiceManual>>,
+    { packageId: string; data: BodyType<CreateServiceManualBody> }
+  > = (props) => {
+    const { packageId, data } = props ?? {};
+
+    return createServiceManual(packageId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateServiceManualMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createServiceManual>>
+>;
+export type CreateServiceManualMutationBody = BodyType<CreateServiceManualBody>;
+export type CreateServiceManualMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Register a new manual for a package
+ */
+export const useCreateServiceManual = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createServiceManual>>,
+    TError,
+    { packageId: string; data: BodyType<CreateServiceManualBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createServiceManual>>,
+  TError,
+  { packageId: string; data: BodyType<CreateServiceManualBody> },
+  TContext
+> => {
+  return useMutation(getCreateServiceManualMutationOptions(options));
+};
+
+/**
+ * @summary Delete a manual
+ */
+export const getDeleteServiceManualUrl = (
+  packageId: string,
+  manualId: number,
+) => {
+  return `/api/packages/${packageId}/manuals/${manualId}`;
+};
+
+export const deleteServiceManual = async (
+  packageId: string,
+  manualId: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteServiceManualUrl(packageId, manualId), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteServiceManualMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteServiceManual>>,
+    TError,
+    { packageId: string; manualId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteServiceManual>>,
+  TError,
+  { packageId: string; manualId: number },
+  TContext
+> => {
+  const mutationKey = ["deleteServiceManual"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteServiceManual>>,
+    { packageId: string; manualId: number }
+  > = (props) => {
+    const { packageId, manualId } = props ?? {};
+
+    return deleteServiceManual(packageId, manualId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteServiceManualMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteServiceManual>>
+>;
+
+export type DeleteServiceManualMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a manual
+ */
+export const useDeleteServiceManual = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteServiceManual>>,
+    TError,
+    { packageId: string; manualId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteServiceManual>>,
+  TError,
+  { packageId: string; manualId: number },
+  TContext
+> => {
+  return useMutation(getDeleteServiceManualMutationOptions(options));
 };

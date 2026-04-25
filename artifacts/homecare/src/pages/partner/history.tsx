@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Package, CheckCircle, MapPin, Calendar, Inbox } from "lucide-react";
+import { LogOut, Package, CheckCircle, MapPin, Calendar, Inbox, BookOpen } from "lucide-react";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -120,6 +120,13 @@ export default function PartnerHistory() {
         <button className="flex-1 py-3 flex flex-col items-center gap-1 text-primary border-t-2 border-primary">
           <CheckCircle className="h-5 w-5" />
           <span className="text-xs font-medium">작업이력</span>
+        </button>
+        <button
+          className="flex-1 py-3 flex flex-col items-center gap-1 text-gray-400"
+          onClick={() => setLocation("/partner/manuals")}
+        >
+          <BookOpen className="h-5 w-5" />
+          <span className="text-xs">매뉴얼</span>
         </button>
       </nav>
     </div>

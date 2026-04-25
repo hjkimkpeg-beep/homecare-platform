@@ -77,6 +77,16 @@ lib/
 - orders (payment_method enum: cash|card, refund_bank_name, refund_account_number, refund_account_holder), order_status_logs
 - job_assignments
 - reviews, as_requests
+- service_manuals (packageId uuid FK → service_packages, title, fileType, objectPath, originalName, fileSize, sortOrder)
+
+## Service Manuals Feature
+
+- 어드민이 패키지별로 PDF/동영상 매뉴얼 파일을 업로드·관리: `/admin/manuals`
+- 파트너가 매뉴얼 파일을 열람·다운로드: `/partner/manuals`
+- 파일은 Object Storage (GCS presigned URL 방식) 에 저장; objectPath는 `/objects/<uuid>` 형식
+- 파일 서빙 엔드포인트: `GET /api/storage/objects/<entityId>`
+- Object Storage env vars: DEFAULT_OBJECT_STORAGE_BUCKET_ID, PRIVATE_OBJECT_DIR, PUBLIC_OBJECT_SEARCH_PATHS
+- lib/object-storage-web: useUpload hook (클라이언트 presigned URL 2단계 업로드)
 
 ## Payment Module
 

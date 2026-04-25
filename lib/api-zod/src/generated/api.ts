@@ -741,3 +741,72 @@ export const GenerateMarketingCopyBody = zod.object({
   tone: zod.string(),
   additionalContext: zod.string().nullish(),
 });
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const RequestUploadUrlBody = zod.object({
+  name: zod.string(),
+  size: zod.number(),
+  contentType: zod.string(),
+});
+
+export const RequestUploadUrlResponse = zod.object({
+  uploadURL: zod.string(),
+  objectPath: zod.string(),
+});
+
+/**
+ * @summary Serve an uploaded object
+ */
+export const GetObjectParams = zod.object({
+  objectPath: zod.coerce.string(),
+});
+
+/**
+ * @summary List manuals for a package
+ */
+export const ListServiceManualsParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const ListServiceManualsResponseItem = zod.object({
+  id: zod.number(),
+  packageId: zod.string(),
+  title: zod.string(),
+  description: zod.string().nullish(),
+  fileType: zod.string(),
+  objectPath: zod.string(),
+  originalName: zod.string(),
+  fileSize: zod.number().nullish(),
+  sortOrder: zod.number(),
+  createdAt: zod.coerce.date(),
+});
+export const ListServiceManualsResponse = zod.array(
+  ListServiceManualsResponseItem,
+);
+
+/**
+ * @summary Register a new manual for a package
+ */
+export const CreateServiceManualParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const CreateServiceManualBody = zod.object({
+  title: zod.string(),
+  description: zod.string().nullish(),
+  fileType: zod.string(),
+  objectPath: zod.string(),
+  originalName: zod.string(),
+  fileSize: zod.number().nullish(),
+  sortOrder: zod.number().optional(),
+});
+
+/**
+ * @summary Delete a manual
+ */
+export const DeleteServiceManualParams = zod.object({
+  packageId: zod.coerce.string(),
+  manualId: zod.coerce.number(),
+});

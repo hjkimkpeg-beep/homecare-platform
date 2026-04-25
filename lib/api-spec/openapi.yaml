@@ -24,6 +24,10 @@ tags:
     description: Reviews and A/S
   - name: openai
     description: OpenAI AI chat and marketing operations
+  - name: storage
+    description: Object storage upload and serving endpoints
+  - name: manuals
+    description: Service manual file management
 paths:
   /healthz:
     get:
@@ -535,6 +539,109 @@ paths:
           content:
             text/event-stream: {}
 
+
+  /storage/uploads/request-url:
+    post:
+      tags: [storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadUrlRequest'
+      responses:
+        '200':
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadUrlResponse'
+
+  /storage/objects/{objectPath}:
+    get:
+      tags: [storage]
+      operationId: getObject
+      summary: Serve an uploaded object
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object content
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+
+  /packages/{packageId}/manuals:
+    get:
+      tags: [manuals]
+      operationId: listServiceManuals
+      summary: List manuals for a package
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of manuals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceManual'
+    post:
+      tags: [manuals]
+      operationId: createServiceManual
+      summary: Register a new manual for a package
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceManualBody'
+      responses:
+        '201':
+          description: Created manual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceManual'
+
+  /packages/{packageId}/manuals/{manualId}:
+    delete:
+      tags: [manuals]
+      operationId: deleteServiceManual
+      summary: Delete a manual
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: manualId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
 
 
 
@@ -1161,3 +1268,89 @@ components:
         - targetAudience
         - channel
         - tone
+
+    UploadUrlRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+        contentType:
+          type: string
+      required:
+        - name
+        - size
+        - contentType
+
+    UploadUrlResponse:
+      type: object
+      properties:
+        uploadURL:
+          type: string
+        objectPath:
+          type: string
+      required:
+        - uploadURL
+        - objectPath
+
+    ServiceManual:
+      type: object
+      properties:
+        id:
+          type: integer
+        packageId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        fileType:
+          type: string
+        objectPath:
+          type: string
+        originalName:
+          type: string
+        fileSize:
+          type: integer
+          nullable: true
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - packageId
+        - title
+        - fileType
+        - objectPath
+        - originalName
+        - sortOrder
+        - createdAt
+
+    CreateServiceManualBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        fileType:
+          type: string
+        objectPath:
+          type: string
+        originalName:
+          type: string
+        fileSize:
+          type: integer
+          nullable: true
+        sortOrder:
+          type: integer
+      required:
+        - title
+        - fileType
+        - objectPath
+        - originalName

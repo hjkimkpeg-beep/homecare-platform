@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut, Search, Megaphone } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut, Search, Megaphone, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -15,6 +15,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { href: "/admin/partners", label: "파트너 관리", icon: Users },
     { href: "/admin/as-requests", label: "A/S 관리", icon: Wrench },
     { href: "/admin/marketing", label: "마케팅 AI", icon: Megaphone },
+    { href: "/admin/manuals", label: "서비스 매뉴얼", icon: BookOpen },
   ];
 
   return (
