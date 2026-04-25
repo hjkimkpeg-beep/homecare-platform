@@ -953,3 +953,260 @@ export const GetPackageVideoResponse = zod.object({
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
 });
+
+/**
+ * @summary List board posts
+ */
+export const ListBoardPostsQueryParams = zod.object({
+  category: zod.coerce.string().optional(),
+  status: zod.coerce.string().optional(),
+  page: zod.coerce.number().optional(),
+  limit: zod.coerce.number().optional(),
+});
+
+export const ListBoardPostsResponse = zod.object({
+  posts: zod.array(
+    zod.object({
+      id: zod.number(),
+      title: zod.string(),
+      category: zod.string(),
+      status: zod.string(),
+      isPinned: zod.boolean(),
+      isSecret: zod.boolean(),
+      authorName: zod.string(),
+      authorType: zod.string(),
+      viewCount: zod.number(),
+      commentCount: zod.number(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+  total: zod.number(),
+  page: zod.number(),
+  limit: zod.number(),
+});
+
+/**
+ * @summary Create a board post
+ */
+export const CreateBoardPostBody = zod.object({
+  title: zod.string(),
+  content: zod.string(),
+  category: zod.string().optional(),
+  isSecret: zod.boolean().optional(),
+});
+
+/**
+ * @summary Get board post with comments
+ */
+export const GetBoardPostParams = zod.object({
+  postId: zod.coerce.number(),
+});
+
+export const GetBoardPostResponse = zod
+  .object({
+    id: zod.number(),
+    userId: zod.string().nullish(),
+    authorName: zod.string(),
+    authorType: zod.string(),
+    title: zod.string(),
+    content: zod.string(),
+    category: zod.string(),
+    status: zod.string(),
+    isPinned: zod.boolean(),
+    isSecret: zod.boolean(),
+    viewCount: zod.number(),
+    contactPhone: zod.string().nullish(),
+    createdAt: zod.coerce.date(),
+    updatedAt: zod.coerce.date(),
+  })
+  .and(
+    zod.object({
+      comments: zod.array(
+        zod.object({
+          id: zod.number(),
+          postId: zod.number(),
+          userId: zod.string().nullish(),
+          authorName: zod.string(),
+          authorType: zod.string(),
+          content: zod.string(),
+          isAiGenerated: zod.boolean(),
+          notificationSent: zod.boolean(),
+          createdAt: zod.coerce.date(),
+          updatedAt: zod.coerce.date(),
+        }),
+      ),
+    }),
+  );
+
+/**
+ * @summary Update a board post
+ */
+export const UpdateBoardPostParams = zod.object({
+  postId: zod.coerce.number(),
+});
+
+export const UpdateBoardPostBody = zod.object({
+  title: zod.string().optional(),
+  content: zod.string().optional(),
+  category: zod.string().optional(),
+  isSecret: zod.boolean().optional(),
+});
+
+export const UpdateBoardPostResponse = zod.object({
+  id: zod.number(),
+  userId: zod.string().nullish(),
+  authorName: zod.string(),
+  authorType: zod.string(),
+  title: zod.string(),
+  content: zod.string(),
+  category: zod.string(),
+  status: zod.string(),
+  isPinned: zod.boolean(),
+  isSecret: zod.boolean(),
+  viewCount: zod.number(),
+  contactPhone: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Delete a board post
+ */
+export const DeleteBoardPostParams = zod.object({
+  postId: zod.coerce.number(),
+});
+
+/**
+ * @summary Add a comment to a board post
+ */
+export const CreateBoardCommentParams = zod.object({
+  postId: zod.coerce.number(),
+});
+
+export const CreateBoardCommentBody = zod.object({
+  content: zod.string(),
+});
+
+/**
+ * @summary Update a board comment
+ */
+export const UpdateBoardCommentParams = zod.object({
+  postId: zod.coerce.number(),
+  commentId: zod.coerce.number(),
+});
+
+export const UpdateBoardCommentBody = zod.object({
+  content: zod.string(),
+});
+
+export const UpdateBoardCommentResponse = zod.object({
+  id: zod.number(),
+  postId: zod.number(),
+  userId: zod.string().nullish(),
+  authorName: zod.string(),
+  authorType: zod.string(),
+  content: zod.string(),
+  isAiGenerated: zod.boolean(),
+  notificationSent: zod.boolean(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Delete a board comment
+ */
+export const DeleteBoardCommentParams = zod.object({
+  postId: zod.coerce.number(),
+  commentId: zod.coerce.number(),
+});
+
+/**
+ * @summary Generate AI reply for a post
+ */
+export const GenerateBoardAiReplyParams = zod.object({
+  postId: zod.coerce.number(),
+});
+
+export const GenerateBoardAiReplyResponse = zod.object({
+  reply: zod.string(),
+});
+
+/**
+ * @summary Pin or unpin a board post
+ */
+export const PinBoardPostParams = zod.object({
+  postId: zod.coerce.number(),
+});
+
+export const PinBoardPostBody = zod.object({
+  isPinned: zod.boolean(),
+});
+
+/**
+ * @summary Update board post status
+ */
+export const UpdateBoardPostStatusParams = zod.object({
+  postId: zod.coerce.number(),
+});
+
+export const UpdateBoardPostStatusBody = zod.object({
+  status: zod.string(),
+});
+
+export const UpdateBoardPostStatusResponse = zod.object({
+  id: zod.number(),
+  userId: zod.string().nullish(),
+  authorName: zod.string(),
+  authorType: zod.string(),
+  title: zod.string(),
+  content: zod.string(),
+  category: zod.string(),
+  status: zod.string(),
+  isPinned: zod.boolean(),
+  isSecret: zod.boolean(),
+  viewCount: zod.number(),
+  contactPhone: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary List pending message notifications
+ */
+export const ListBoardNotificationsQueryParams = zod.object({
+  sent: zod.coerce.string().optional(),
+});
+
+export const ListBoardNotificationsResponseItem = zod.object({
+  id: zod.number(),
+  postId: zod.number(),
+  commentId: zod.number().nullish(),
+  recipientName: zod.string(),
+  recipientPhone: zod.string(),
+  messageContent: zod.string(),
+  isSent: zod.boolean(),
+  sentAt: zod.coerce.date().nullish(),
+  createdAt: zod.coerce.date(),
+});
+export const ListBoardNotificationsResponse = zod.array(
+  ListBoardNotificationsResponseItem,
+);
+
+/**
+ * @summary Mark notification as sent
+ */
+export const MarkNotificationSentParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const MarkNotificationSentResponse = zod.object({
+  id: zod.number(),
+  postId: zod.number(),
+  commentId: zod.number().nullish(),
+  recipientName: zod.string(),
+  recipientPhone: zod.string(),
+  messageContent: zod.string(),
+  isSent: zod.boolean(),
+  sentAt: zod.coerce.date().nullish(),
+  createdAt: zod.coerce.date(),
+});

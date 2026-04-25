@@ -436,6 +436,91 @@ export interface PackageAiVideo {
   updatedAt: string;
 }
 
+export interface BoardPost {
+  id: number;
+  userId?: string | null;
+  authorName: string;
+  authorType: string;
+  title: string;
+  content: string;
+  category: string;
+  status: string;
+  isPinned: boolean;
+  isSecret: boolean;
+  viewCount: number;
+  contactPhone?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BoardPostListItem {
+  id: number;
+  title: string;
+  category: string;
+  status: string;
+  isPinned: boolean;
+  isSecret: boolean;
+  authorName: string;
+  authorType: string;
+  viewCount: number;
+  commentCount: number;
+  createdAt: string;
+}
+
+export interface BoardPostListResponse {
+  posts: BoardPostListItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface BoardComment {
+  id: number;
+  postId: number;
+  userId?: string | null;
+  authorName: string;
+  authorType: string;
+  content: string;
+  isAiGenerated: boolean;
+  notificationSent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type BoardPostDetail = BoardPost & {
+  comments: BoardComment[];
+};
+
+export interface BoardNotification {
+  id: number;
+  postId: number;
+  commentId?: number | null;
+  recipientName: string;
+  recipientPhone: string;
+  messageContent: string;
+  isSent: boolean;
+  sentAt?: string | null;
+  createdAt: string;
+}
+
+export interface CreateBoardPostBody {
+  title: string;
+  content: string;
+  category?: string;
+  isSecret?: boolean;
+}
+
+export interface UpdateBoardPostBody {
+  title?: string;
+  content?: string;
+  category?: string;
+  isSecret?: boolean;
+}
+
+export interface CreateBoardCommentBody {
+  content: string;
+}
+
 export type ListOrdersParams = {
   status?: string;
 };
@@ -461,4 +546,27 @@ export type AdminListAsRequestsParams = {
 export type GeneratePackageVideo200 = {
   status: string;
   message: string;
+};
+
+export type ListBoardPostsParams = {
+  category?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+};
+
+export type GenerateBoardAiReply200 = {
+  reply: string;
+};
+
+export type PinBoardPostBody = {
+  isPinned: boolean;
+};
+
+export type UpdateBoardPostStatusBody = {
+  status: string;
+};
+
+export type ListBoardNotificationsParams = {
+  sent?: string;
 };

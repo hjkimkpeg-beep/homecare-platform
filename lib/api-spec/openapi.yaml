@@ -840,6 +840,301 @@ paths:
         '404':
           description: Not found
 
+  /board:
+    get:
+      tags: [board]
+      operationId: listBoardPosts
+      summary: List board posts
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Board posts list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardPostListResponse'
+    post:
+      tags: [board]
+      operationId: createBoardPost
+      summary: Create a board post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBoardPostBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardPost'
+
+  /board/{postId}:
+    get:
+      tags: [board]
+      operationId: getBoardPost
+      summary: Get board post with comments
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Board post detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardPostDetail'
+        '404':
+          description: Not found
+    patch:
+      tags: [board]
+      operationId: updateBoardPost
+      summary: Update a board post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBoardPostBody'
+      responses:
+        '200':
+          description: Updated post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardPost'
+    delete:
+      tags: [board]
+      operationId: deleteBoardPost
+      summary: Delete a board post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+
+  /board/{postId}/comments:
+    post:
+      tags: [board]
+      operationId: createBoardComment
+      summary: Add a comment to a board post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBoardCommentBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardComment'
+
+  /board/{postId}/comments/{commentId}:
+    patch:
+      tags: [board]
+      operationId: updateBoardComment
+      summary: Update a board comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBoardCommentBody'
+      responses:
+        '200':
+          description: Updated comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardComment'
+    delete:
+      tags: [board]
+      operationId: deleteBoardComment
+      summary: Delete a board comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+
+  /board/{postId}/ai-reply:
+    post:
+      tags: [board]
+      operationId: generateBoardAiReply
+      summary: Generate AI reply for a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: AI reply
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reply:
+                    type: string
+                required:
+                  - reply
+
+  /admin/board/{postId}/pin:
+    patch:
+      tags: [board]
+      operationId: pinBoardPost
+      summary: Pin or unpin a board post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isPinned:
+                  type: boolean
+              required:
+                - isPinned
+      responses:
+        '200':
+          description: OK
+
+  /admin/board/{postId}/status:
+    patch:
+      tags: [board]
+      operationId: updateBoardPostStatus
+      summary: Update board post status
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+              required:
+                - status
+      responses:
+        '200':
+          description: Updated post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardPost'
+
+  /admin/board/notifications:
+    get:
+      tags: [board]
+      operationId: listBoardNotifications
+      summary: List pending message notifications
+      parameters:
+        - name: sent
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notifications list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoardNotification'
+
+  /admin/board/notifications/{id}/sent:
+    patch:
+      tags: [board]
+      operationId: markNotificationSent
+      summary: Mark notification as sent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated notification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardNotification'
 
 
 components:
@@ -1700,3 +1995,228 @@ components:
         - status
         - createdAt
         - updatedAt
+
+    BoardPost:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+          nullable: true
+        authorName:
+          type: string
+        authorType:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+        isPinned:
+          type: boolean
+        isSecret:
+          type: boolean
+        viewCount:
+          type: integer
+        contactPhone:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - authorName
+        - authorType
+        - title
+        - content
+        - category
+        - status
+        - isPinned
+        - isSecret
+        - viewCount
+        - createdAt
+        - updatedAt
+
+    BoardPostListItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+        isPinned:
+          type: boolean
+        isSecret:
+          type: boolean
+        authorName:
+          type: string
+        authorType:
+          type: string
+        viewCount:
+          type: integer
+        commentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - category
+        - status
+        - isPinned
+        - isSecret
+        - authorName
+        - authorType
+        - viewCount
+        - commentCount
+        - createdAt
+
+    BoardPostListResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoardPostListItem'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - posts
+        - total
+        - page
+        - limit
+
+    BoardComment:
+      type: object
+      properties:
+        id:
+          type: integer
+        postId:
+          type: integer
+        userId:
+          type: string
+          nullable: true
+        authorName:
+          type: string
+        authorType:
+          type: string
+        content:
+          type: string
+        isAiGenerated:
+          type: boolean
+        notificationSent:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - postId
+        - authorName
+        - authorType
+        - content
+        - isAiGenerated
+        - notificationSent
+        - createdAt
+        - updatedAt
+
+    BoardPostDetail:
+      allOf:
+        - $ref: '#/components/schemas/BoardPost'
+        - type: object
+          properties:
+            comments:
+              type: array
+              items:
+                $ref: '#/components/schemas/BoardComment'
+          required:
+            - comments
+
+    BoardNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+        postId:
+          type: integer
+        commentId:
+          type: integer
+          nullable: true
+        recipientName:
+          type: string
+        recipientPhone:
+          type: string
+        messageContent:
+          type: string
+        isSent:
+          type: boolean
+        sentAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - postId
+        - recipientName
+        - recipientPhone
+        - messageContent
+        - isSent
+        - createdAt
+
+    CreateBoardPostBody:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        isSecret:
+          type: boolean
+      required:
+        - title
+        - content
+
+    UpdateBoardPostBody:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        isSecret:
+          type: boolean
+
+    CreateBoardCommentBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content

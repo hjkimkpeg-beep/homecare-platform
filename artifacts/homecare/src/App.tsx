@@ -36,6 +36,8 @@ import PartnerHistory from "@/pages/partner/history";
 import PartnerManuals from "@/pages/partner/manuals";
 import AdminManuals from "@/pages/admin/manuals";
 import AdminVideos from "@/pages/admin/videos";
+import AdminBoard from "@/pages/admin/board";
+import CustomerBoard from "@/pages/customer/board";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -100,6 +102,9 @@ function Router() {
       <Route path="/as-requests">
         {() => <CustomerGuard component={CustomerAsRequests} />}
       </Route>
+      <Route path="/board">
+        {() => <CustomerGuard component={CustomerBoard} />}
+      </Route>
 
       {/* Admin */}
       <Route path="/admin">
@@ -128,6 +133,9 @@ function Router() {
       </Route>
       <Route path="/admin/videos">
         {() => <AdminGuard component={AdminVideos} />}
+      </Route>
+      <Route path="/admin/board">
+        {() => <AdminGuard component={AdminBoard} />}
       </Route>
 
       {/* Partner */}

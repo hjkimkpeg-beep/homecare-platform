@@ -27,7 +27,14 @@ import type {
   ApprovePartnerBody,
   AsRequest,
   AssignOrderBody,
+  BoardComment,
+  BoardNotification,
+  BoardPost,
+  BoardPostDetail,
+  BoardPostListResponse,
   CreateAsRequestBody,
+  CreateBoardCommentBody,
+  CreateBoardPostBody,
   CreateExternalVideoBody,
   CreateOpenaiConversationBody,
   CreateOrderBody,
@@ -35,10 +42,13 @@ import type {
   CreateServiceManualBody,
   CreateStandardManualBody,
   ExternalVideo,
+  GenerateBoardAiReply200,
   GenerateMarketingCopyBody,
   GeneratePackageVideo200,
   HealthStatus,
   JobAssignment,
+  ListBoardNotificationsParams,
+  ListBoardPostsParams,
   ListOrdersParams,
   LoginBody,
   LoginResponse,
@@ -48,12 +58,15 @@ import type {
   OrderDetail,
   PackageAiVideo,
   PartnerProfile,
+  PinBoardPostBody,
   Review,
   SendOpenaiMessageBody,
   ServiceManual,
   ServicePackage,
   ServicePackageDetail,
   StandardManual,
+  UpdateBoardPostBody,
+  UpdateBoardPostStatusBody,
   UpdateExternalVideoBody,
   UpdateOrderStatusBody,
   UploadUrlRequest,
@@ -3622,3 +3635,1168 @@ export function useGetPackageVideo<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary List board posts
+ */
+export const getListBoardPostsUrl = (params?: ListBoardPostsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/board?${stringifiedParams}`
+    : `/api/board`;
+};
+
+export const listBoardPosts = async (
+  params?: ListBoardPostsParams,
+  options?: RequestInit,
+): Promise<BoardPostListResponse> => {
+  return customFetch<BoardPostListResponse>(getListBoardPostsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListBoardPostsQueryKey = (params?: ListBoardPostsParams) => {
+  return [`/api/board`, ...(params ? [params] : [])] as const;
+};
+
+export const getListBoardPostsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listBoardPosts>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListBoardPostsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listBoardPosts>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListBoardPostsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listBoardPosts>>> = ({
+    signal,
+  }) => listBoardPosts(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listBoardPosts>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListBoardPostsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listBoardPosts>>
+>;
+export type ListBoardPostsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List board posts
+ */
+
+export function useListBoardPosts<
+  TData = Awaited<ReturnType<typeof listBoardPosts>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListBoardPostsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listBoardPosts>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListBoardPostsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a board post
+ */
+export const getCreateBoardPostUrl = () => {
+  return `/api/board`;
+};
+
+export const createBoardPost = async (
+  createBoardPostBody: CreateBoardPostBody,
+  options?: RequestInit,
+): Promise<BoardPost> => {
+  return customFetch<BoardPost>(getCreateBoardPostUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createBoardPostBody),
+  });
+};
+
+export const getCreateBoardPostMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBoardPost>>,
+    TError,
+    { data: BodyType<CreateBoardPostBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createBoardPost>>,
+  TError,
+  { data: BodyType<CreateBoardPostBody> },
+  TContext
+> => {
+  const mutationKey = ["createBoardPost"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createBoardPost>>,
+    { data: BodyType<CreateBoardPostBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createBoardPost(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateBoardPostMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createBoardPost>>
+>;
+export type CreateBoardPostMutationBody = BodyType<CreateBoardPostBody>;
+export type CreateBoardPostMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a board post
+ */
+export const useCreateBoardPost = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBoardPost>>,
+    TError,
+    { data: BodyType<CreateBoardPostBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createBoardPost>>,
+  TError,
+  { data: BodyType<CreateBoardPostBody> },
+  TContext
+> => {
+  return useMutation(getCreateBoardPostMutationOptions(options));
+};
+
+/**
+ * @summary Get board post with comments
+ */
+export const getGetBoardPostUrl = (postId: number) => {
+  return `/api/board/${postId}`;
+};
+
+export const getBoardPost = async (
+  postId: number,
+  options?: RequestInit,
+): Promise<BoardPostDetail> => {
+  return customFetch<BoardPostDetail>(getGetBoardPostUrl(postId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetBoardPostQueryKey = (postId: number) => {
+  return [`/api/board/${postId}`] as const;
+};
+
+export const getGetBoardPostQueryOptions = <
+  TData = Awaited<ReturnType<typeof getBoardPost>>,
+  TError = ErrorType<void>,
+>(
+  postId: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getBoardPost>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetBoardPostQueryKey(postId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getBoardPost>>> = ({
+    signal,
+  }) => getBoardPost(postId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!postId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getBoardPost>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetBoardPostQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getBoardPost>>
+>;
+export type GetBoardPostQueryError = ErrorType<void>;
+
+/**
+ * @summary Get board post with comments
+ */
+
+export function useGetBoardPost<
+  TData = Awaited<ReturnType<typeof getBoardPost>>,
+  TError = ErrorType<void>,
+>(
+  postId: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getBoardPost>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetBoardPostQueryOptions(postId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Update a board post
+ */
+export const getUpdateBoardPostUrl = (postId: number) => {
+  return `/api/board/${postId}`;
+};
+
+export const updateBoardPost = async (
+  postId: number,
+  updateBoardPostBody: UpdateBoardPostBody,
+  options?: RequestInit,
+): Promise<BoardPost> => {
+  return customFetch<BoardPost>(getUpdateBoardPostUrl(postId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateBoardPostBody),
+  });
+};
+
+export const getUpdateBoardPostMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBoardPost>>,
+    TError,
+    { postId: number; data: BodyType<UpdateBoardPostBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateBoardPost>>,
+  TError,
+  { postId: number; data: BodyType<UpdateBoardPostBody> },
+  TContext
+> => {
+  const mutationKey = ["updateBoardPost"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateBoardPost>>,
+    { postId: number; data: BodyType<UpdateBoardPostBody> }
+  > = (props) => {
+    const { postId, data } = props ?? {};
+
+    return updateBoardPost(postId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateBoardPostMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateBoardPost>>
+>;
+export type UpdateBoardPostMutationBody = BodyType<UpdateBoardPostBody>;
+export type UpdateBoardPostMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update a board post
+ */
+export const useUpdateBoardPost = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBoardPost>>,
+    TError,
+    { postId: number; data: BodyType<UpdateBoardPostBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateBoardPost>>,
+  TError,
+  { postId: number; data: BodyType<UpdateBoardPostBody> },
+  TContext
+> => {
+  return useMutation(getUpdateBoardPostMutationOptions(options));
+};
+
+/**
+ * @summary Delete a board post
+ */
+export const getDeleteBoardPostUrl = (postId: number) => {
+  return `/api/board/${postId}`;
+};
+
+export const deleteBoardPost = async (
+  postId: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteBoardPostUrl(postId), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteBoardPostMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteBoardPost>>,
+    TError,
+    { postId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteBoardPost>>,
+  TError,
+  { postId: number },
+  TContext
+> => {
+  const mutationKey = ["deleteBoardPost"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteBoardPost>>,
+    { postId: number }
+  > = (props) => {
+    const { postId } = props ?? {};
+
+    return deleteBoardPost(postId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteBoardPostMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteBoardPost>>
+>;
+
+export type DeleteBoardPostMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a board post
+ */
+export const useDeleteBoardPost = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteBoardPost>>,
+    TError,
+    { postId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteBoardPost>>,
+  TError,
+  { postId: number },
+  TContext
+> => {
+  return useMutation(getDeleteBoardPostMutationOptions(options));
+};
+
+/**
+ * @summary Add a comment to a board post
+ */
+export const getCreateBoardCommentUrl = (postId: number) => {
+  return `/api/board/${postId}/comments`;
+};
+
+export const createBoardComment = async (
+  postId: number,
+  createBoardCommentBody: CreateBoardCommentBody,
+  options?: RequestInit,
+): Promise<BoardComment> => {
+  return customFetch<BoardComment>(getCreateBoardCommentUrl(postId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createBoardCommentBody),
+  });
+};
+
+export const getCreateBoardCommentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBoardComment>>,
+    TError,
+    { postId: number; data: BodyType<CreateBoardCommentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createBoardComment>>,
+  TError,
+  { postId: number; data: BodyType<CreateBoardCommentBody> },
+  TContext
+> => {
+  const mutationKey = ["createBoardComment"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createBoardComment>>,
+    { postId: number; data: BodyType<CreateBoardCommentBody> }
+  > = (props) => {
+    const { postId, data } = props ?? {};
+
+    return createBoardComment(postId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateBoardCommentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createBoardComment>>
+>;
+export type CreateBoardCommentMutationBody = BodyType<CreateBoardCommentBody>;
+export type CreateBoardCommentMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Add a comment to a board post
+ */
+export const useCreateBoardComment = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBoardComment>>,
+    TError,
+    { postId: number; data: BodyType<CreateBoardCommentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createBoardComment>>,
+  TError,
+  { postId: number; data: BodyType<CreateBoardCommentBody> },
+  TContext
+> => {
+  return useMutation(getCreateBoardCommentMutationOptions(options));
+};
+
+/**
+ * @summary Update a board comment
+ */
+export const getUpdateBoardCommentUrl = (postId: number, commentId: number) => {
+  return `/api/board/${postId}/comments/${commentId}`;
+};
+
+export const updateBoardComment = async (
+  postId: number,
+  commentId: number,
+  createBoardCommentBody: CreateBoardCommentBody,
+  options?: RequestInit,
+): Promise<BoardComment> => {
+  return customFetch<BoardComment>(
+    getUpdateBoardCommentUrl(postId, commentId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createBoardCommentBody),
+    },
+  );
+};
+
+export const getUpdateBoardCommentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBoardComment>>,
+    TError,
+    {
+      postId: number;
+      commentId: number;
+      data: BodyType<CreateBoardCommentBody>;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateBoardComment>>,
+  TError,
+  { postId: number; commentId: number; data: BodyType<CreateBoardCommentBody> },
+  TContext
+> => {
+  const mutationKey = ["updateBoardComment"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateBoardComment>>,
+    {
+      postId: number;
+      commentId: number;
+      data: BodyType<CreateBoardCommentBody>;
+    }
+  > = (props) => {
+    const { postId, commentId, data } = props ?? {};
+
+    return updateBoardComment(postId, commentId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateBoardCommentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateBoardComment>>
+>;
+export type UpdateBoardCommentMutationBody = BodyType<CreateBoardCommentBody>;
+export type UpdateBoardCommentMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update a board comment
+ */
+export const useUpdateBoardComment = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBoardComment>>,
+    TError,
+    {
+      postId: number;
+      commentId: number;
+      data: BodyType<CreateBoardCommentBody>;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateBoardComment>>,
+  TError,
+  { postId: number; commentId: number; data: BodyType<CreateBoardCommentBody> },
+  TContext
+> => {
+  return useMutation(getUpdateBoardCommentMutationOptions(options));
+};
+
+/**
+ * @summary Delete a board comment
+ */
+export const getDeleteBoardCommentUrl = (postId: number, commentId: number) => {
+  return `/api/board/${postId}/comments/${commentId}`;
+};
+
+export const deleteBoardComment = async (
+  postId: number,
+  commentId: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteBoardCommentUrl(postId, commentId), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteBoardCommentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteBoardComment>>,
+    TError,
+    { postId: number; commentId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteBoardComment>>,
+  TError,
+  { postId: number; commentId: number },
+  TContext
+> => {
+  const mutationKey = ["deleteBoardComment"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteBoardComment>>,
+    { postId: number; commentId: number }
+  > = (props) => {
+    const { postId, commentId } = props ?? {};
+
+    return deleteBoardComment(postId, commentId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteBoardCommentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteBoardComment>>
+>;
+
+export type DeleteBoardCommentMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a board comment
+ */
+export const useDeleteBoardComment = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteBoardComment>>,
+    TError,
+    { postId: number; commentId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteBoardComment>>,
+  TError,
+  { postId: number; commentId: number },
+  TContext
+> => {
+  return useMutation(getDeleteBoardCommentMutationOptions(options));
+};
+
+/**
+ * @summary Generate AI reply for a post
+ */
+export const getGenerateBoardAiReplyUrl = (postId: number) => {
+  return `/api/board/${postId}/ai-reply`;
+};
+
+export const generateBoardAiReply = async (
+  postId: number,
+  options?: RequestInit,
+): Promise<GenerateBoardAiReply200> => {
+  return customFetch<GenerateBoardAiReply200>(
+    getGenerateBoardAiReplyUrl(postId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+export const getGenerateBoardAiReplyMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateBoardAiReply>>,
+    TError,
+    { postId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateBoardAiReply>>,
+  TError,
+  { postId: number },
+  TContext
+> => {
+  const mutationKey = ["generateBoardAiReply"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateBoardAiReply>>,
+    { postId: number }
+  > = (props) => {
+    const { postId } = props ?? {};
+
+    return generateBoardAiReply(postId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateBoardAiReplyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateBoardAiReply>>
+>;
+
+export type GenerateBoardAiReplyMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Generate AI reply for a post
+ */
+export const useGenerateBoardAiReply = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateBoardAiReply>>,
+    TError,
+    { postId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateBoardAiReply>>,
+  TError,
+  { postId: number },
+  TContext
+> => {
+  return useMutation(getGenerateBoardAiReplyMutationOptions(options));
+};
+
+/**
+ * @summary Pin or unpin a board post
+ */
+export const getPinBoardPostUrl = (postId: number) => {
+  return `/api/admin/board/${postId}/pin`;
+};
+
+export const pinBoardPost = async (
+  postId: number,
+  pinBoardPostBody: PinBoardPostBody,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getPinBoardPostUrl(postId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(pinBoardPostBody),
+  });
+};
+
+export const getPinBoardPostMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof pinBoardPost>>,
+    TError,
+    { postId: number; data: BodyType<PinBoardPostBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof pinBoardPost>>,
+  TError,
+  { postId: number; data: BodyType<PinBoardPostBody> },
+  TContext
+> => {
+  const mutationKey = ["pinBoardPost"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof pinBoardPost>>,
+    { postId: number; data: BodyType<PinBoardPostBody> }
+  > = (props) => {
+    const { postId, data } = props ?? {};
+
+    return pinBoardPost(postId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PinBoardPostMutationResult = NonNullable<
+  Awaited<ReturnType<typeof pinBoardPost>>
+>;
+export type PinBoardPostMutationBody = BodyType<PinBoardPostBody>;
+export type PinBoardPostMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Pin or unpin a board post
+ */
+export const usePinBoardPost = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof pinBoardPost>>,
+    TError,
+    { postId: number; data: BodyType<PinBoardPostBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof pinBoardPost>>,
+  TError,
+  { postId: number; data: BodyType<PinBoardPostBody> },
+  TContext
+> => {
+  return useMutation(getPinBoardPostMutationOptions(options));
+};
+
+/**
+ * @summary Update board post status
+ */
+export const getUpdateBoardPostStatusUrl = (postId: number) => {
+  return `/api/admin/board/${postId}/status`;
+};
+
+export const updateBoardPostStatus = async (
+  postId: number,
+  updateBoardPostStatusBody: UpdateBoardPostStatusBody,
+  options?: RequestInit,
+): Promise<BoardPost> => {
+  return customFetch<BoardPost>(getUpdateBoardPostStatusUrl(postId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateBoardPostStatusBody),
+  });
+};
+
+export const getUpdateBoardPostStatusMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBoardPostStatus>>,
+    TError,
+    { postId: number; data: BodyType<UpdateBoardPostStatusBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateBoardPostStatus>>,
+  TError,
+  { postId: number; data: BodyType<UpdateBoardPostStatusBody> },
+  TContext
+> => {
+  const mutationKey = ["updateBoardPostStatus"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateBoardPostStatus>>,
+    { postId: number; data: BodyType<UpdateBoardPostStatusBody> }
+  > = (props) => {
+    const { postId, data } = props ?? {};
+
+    return updateBoardPostStatus(postId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateBoardPostStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateBoardPostStatus>>
+>;
+export type UpdateBoardPostStatusMutationBody =
+  BodyType<UpdateBoardPostStatusBody>;
+export type UpdateBoardPostStatusMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update board post status
+ */
+export const useUpdateBoardPostStatus = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBoardPostStatus>>,
+    TError,
+    { postId: number; data: BodyType<UpdateBoardPostStatusBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateBoardPostStatus>>,
+  TError,
+  { postId: number; data: BodyType<UpdateBoardPostStatusBody> },
+  TContext
+> => {
+  return useMutation(getUpdateBoardPostStatusMutationOptions(options));
+};
+
+/**
+ * @summary List pending message notifications
+ */
+export const getListBoardNotificationsUrl = (
+  params?: ListBoardNotificationsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/admin/board/notifications?${stringifiedParams}`
+    : `/api/admin/board/notifications`;
+};
+
+export const listBoardNotifications = async (
+  params?: ListBoardNotificationsParams,
+  options?: RequestInit,
+): Promise<BoardNotification[]> => {
+  return customFetch<BoardNotification[]>(
+    getListBoardNotificationsUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getListBoardNotificationsQueryKey = (
+  params?: ListBoardNotificationsParams,
+) => {
+  return [
+    `/api/admin/board/notifications`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListBoardNotificationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listBoardNotifications>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListBoardNotificationsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listBoardNotifications>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListBoardNotificationsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listBoardNotifications>>
+  > = ({ signal }) =>
+    listBoardNotifications(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listBoardNotifications>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListBoardNotificationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listBoardNotifications>>
+>;
+export type ListBoardNotificationsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List pending message notifications
+ */
+
+export function useListBoardNotifications<
+  TData = Awaited<ReturnType<typeof listBoardNotifications>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListBoardNotificationsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listBoardNotifications>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListBoardNotificationsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Mark notification as sent
+ */
+export const getMarkNotificationSentUrl = (id: number) => {
+  return `/api/admin/board/notifications/${id}/sent`;
+};
+
+export const markNotificationSent = async (
+  id: number,
+  options?: RequestInit,
+): Promise<BoardNotification> => {
+  return customFetch<BoardNotification>(getMarkNotificationSentUrl(id), {
+    ...options,
+    method: "PATCH",
+  });
+};
+
+export const getMarkNotificationSentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof markNotificationSent>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof markNotificationSent>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["markNotificationSent"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof markNotificationSent>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return markNotificationSent(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type MarkNotificationSentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof markNotificationSent>>
+>;
+
+export type MarkNotificationSentMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Mark notification as sent
+ */
+export const useMarkNotificationSent = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof markNotificationSent>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof markNotificationSent>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getMarkNotificationSentMutationOptions(options));
+};

@@ -12,6 +12,7 @@ import manualsRouter from "./manuals";
 import videosRouter from "./videos";
 import externalVideosRouter from "./external-videos";
 import standardManualsRouter from "./standard-manuals";
+import boardRouter from "./board";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(manualsRouter);
 router.use(videosRouter);
 router.use(externalVideosRouter);
 router.use(standardManualsRouter);
+router.use(boardRouter);
 
 export default router;

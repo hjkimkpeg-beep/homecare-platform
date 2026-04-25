@@ -78,6 +78,12 @@ lib/
 - job_assignments
 - reviews, as_requests
 - service_manuals (packageId uuid FK → service_packages, title, fileType, objectPath, originalName, fileSize, sortOrder)
+- package_standard_manuals (packageId → service_packages, title, fileType, objectPath, originalName, fileSize)
+- package_ai_videos (packageId, status, script JSON, errorMessage)
+- package_external_videos (packageId, title, videoType, source, objectPath, thumbnailUrl, sortOrder)
+- board_posts (userId, authorName, authorType, title, content, category enum, status enum, isPinned, isSecret, viewCount, contactPhone, deletedAt)
+- board_comments (postId, userId, authorName, authorType, content, isAiGenerated, notificationSent, deletedAt)
+- board_notifications (postId, commentId, recipientName, recipientPhone, messageContent, isSent, sentAt)
 
 ## Service Manuals Feature
 
@@ -95,3 +101,14 @@ lib/
 - 예약 취소 시: 카드는 카드사 자동 환불 안내, 현금은 입력된 계좌로 환불 안내
 - orders 테이블 컬럼: payment_method, refund_bank_name, refund_account_number, refund_account_holder
 - api-zod index.ts는 generated/api.ts 하나만 export (api.schemas 없음)
+
+## Board (게시판) Feature
+
+- 고객/관리자 간 소통 게시판: `/board` (고객), `/admin/board` (관리자)
+- 게시물 카테고리: inquiry(문의), notice(공지), general(자유), complaint(불만/개선)
+- 게시물 상태: open(대기중), answered(답변완료), closed(종결)
+- 권한: 작성자 또는 관리자만 수정/삭제 가능; 비밀글은 작성자/관리자만 열람
+- AI 답변: 관리자가 'AI 답변 생성' 클릭 시 GPT-4.1로 고객 문의에 최적 답변 자동 생성
+- 메시지 알림: 관리자가 inquiry 카테고리 게시글에 답변하면, board_notifications 테이블에 발송 메시지가 자동 생성됨
+  - 관리자는 /admin/board 상단 '발송 대기 알림' 패널에서 메시지 내용 복사 및 전송 완료 처리 가능
+- Session 접근: req.session.userId, req.session.userRole (user 객체 없음)
