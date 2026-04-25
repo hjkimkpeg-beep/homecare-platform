@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { translateOrderStatus } from "@/lib/format";
 import {
-  Search, Loader2, CalendarDays, MapPin, FileText,
-  User, Phone, Package, ChevronRight, Filter
+  Search, Loader2, MapPin, FileText,
+  User, Phone, Package, ChevronRight,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -39,9 +39,9 @@ const STATUS_OPTIONS = [
 ];
 
 function statusColor(s: string) {
-  if (s === "completed")  return "bg-green-100 text-green-800";
-  if (s === "cancelled")  return "bg-red-100 text-red-800";
-  if (s === "in_progress") return "bg-blue-100 text-blue-800";
+  if (s === "completed")        return "bg-green-100 text-green-800";
+  if (s === "cancelled")        return "bg-red-100 text-red-800";
+  if (s === "in_progress")      return "bg-blue-100 text-blue-800";
   if (s === "pending_assignment") return "bg-amber-100 text-amber-800";
   return "bg-gray-100 text-gray-800";
 }
@@ -80,47 +80,52 @@ export default function AdminBookingLookup() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">예약 현황 조회</h1>
-          <p className="text-gray-500 mt-1">고객 전화번호, 예약번호, 날짜 범위로 예약을 검색합니다.</p>
+          <h1 className="text-3xl font-bold text-gray-900">예약 현황 조회</h1>
+          <p className="text-base text-gray-500 mt-1.5">고객 전화번호, 예약번호, 날짜 범위로 예약을 검색합니다.</p>
         </div>
 
         {/* Search form */}
         <form onSubmit={handleSearch} className="bg-white rounded-2xl border shadow-sm p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* 고객 전화번호 */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <label className="block text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 고객 전화번호
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <Input
-                  className="pl-9"
+                  className="pl-10 h-12 text-base"
                   placeholder="01012345678"
                   value={query.phone}
                   onChange={(e) => setQuery(q => ({ ...q, phone: e.target.value }))}
                 />
               </div>
             </div>
+
+            {/* 예약번호 */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <label className="block text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 예약번호
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <Input
-                  className="pl-9"
+                  className="pl-10 h-12 text-base"
                   placeholder="HC20240424XXXX"
                   value={query.orderNumber}
                   onChange={(e) => setQuery(q => ({ ...q, orderNumber: e.target.value }))}
                 />
               </div>
             </div>
+
+            {/* 예약 상태 */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <label className="block text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 예약 상태
               </label>
               <select
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                className="w-full h-12 rounded-md border border-input bg-background px-3 text-base"
                 value={query.status}
                 onChange={(e) => setQuery(q => ({ ...q, status: e.target.value }))}
               >
@@ -129,35 +134,43 @@ export default function AdminBookingLookup() {
                 ))}
               </select>
             </div>
+
+            {/* 예약일 시작 */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <label className="block text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 예약일 (시작)
               </label>
               <Input
                 type="date"
+                className="h-12 text-base"
                 value={query.dateFrom}
                 onChange={(e) => setQuery(q => ({ ...q, dateFrom: e.target.value }))}
               />
             </div>
+
+            {/* 예약일 종료 */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <label className="block text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 예약일 (종료)
               </label>
               <Input
                 type="date"
+                className="h-12 text-base"
                 value={query.dateTo}
                 onChange={(e) => setQuery(q => ({ ...q, dateTo: e.target.value }))}
               />
             </div>
+
+            {/* 검색 버튼 */}
             <div className="flex items-end">
               <Button
                 type="submit"
-                className="w-full bg-gray-900 hover:bg-gray-700 text-white"
+                className="w-full h-12 text-base bg-gray-900 hover:bg-gray-700 text-white"
                 disabled={isSearching}
               >
                 {isSearching
-                  ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> 조회 중</>
-                  : <><Search className="w-4 h-4 mr-2" /> 검색</>
+                  ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> 조회 중</>
+                  : <><Search className="w-5 h-5 mr-2" /> 검색</>
                 }
               </Button>
             </div>
@@ -168,40 +181,40 @@ export default function AdminBookingLookup() {
         {results !== null && (
           <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b flex items-center justify-between">
-              <p className="text-sm font-semibold text-gray-700">
+              <p className="text-base font-semibold text-gray-700">
                 검색 결과 <span className="text-blue-600">{results.length}건</span>
               </p>
             </div>
 
             {results.length === 0 ? (
               <div className="py-20 text-center text-gray-400">
-                <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                <p>검색 결과가 없습니다.</p>
+                <Search className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p className="text-base">검색 결과가 없습니다.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left whitespace-nowrap">
+                <table className="w-full text-base text-left whitespace-nowrap">
                   <thead className="bg-gray-50 border-b text-gray-500">
                     <tr>
-                      <th className="px-5 py-3 font-medium">예약번호</th>
-                      <th className="px-5 py-3 font-medium">서비스</th>
-                      <th className="px-5 py-3 font-medium">고객</th>
-                      <th className="px-5 py-3 font-medium">예약일시</th>
-                      <th className="px-5 py-3 font-medium">주소</th>
-                      <th className="px-5 py-3 font-medium">금액</th>
-                      <th className="px-5 py-3 font-medium">상태</th>
-                      <th className="px-5 py-3 font-medium text-right">상세</th>
+                      <th className="px-5 py-3.5 font-medium">예약번호</th>
+                      <th className="px-5 py-3.5 font-medium">서비스</th>
+                      <th className="px-5 py-3.5 font-medium">고객</th>
+                      <th className="px-5 py-3.5 font-medium">예약일시</th>
+                      <th className="px-5 py-3.5 font-medium">주소</th>
+                      <th className="px-5 py-3.5 font-medium">금액</th>
+                      <th className="px-5 py-3.5 font-medium">상태</th>
+                      <th className="px-5 py-3.5 font-medium text-right">상세</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {results.map((order) => (
                       <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-5 py-4 font-mono text-xs text-gray-600">{order.orderNumber}</td>
+                        <td className="px-5 py-4 font-mono text-sm text-gray-600">{order.orderNumber}</td>
                         <td className="px-5 py-4 font-medium text-gray-900">{order.packageName}</td>
                         <td className="px-5 py-4">
                           <div>
                             <p className="font-medium text-gray-900">{order.customerName || "-"}</p>
-                            <p className="text-xs text-gray-400">{order.customerPhone || "-"}</p>
+                            <p className="text-sm text-gray-400">{order.customerPhone || "-"}</p>
                           </div>
                         </td>
                         <td className="px-5 py-4 text-gray-600">
@@ -210,21 +223,21 @@ export default function AdminBookingLookup() {
                             hour: "2-digit", minute: "2-digit",
                           })}
                         </td>
-                        <td className="px-5 py-4 text-gray-600 max-w-[180px] truncate">
+                        <td className="px-5 py-4 text-gray-600 max-w-[200px] truncate">
                           {order.roadAddress}
                         </td>
                         <td className="px-5 py-4 font-bold text-gray-900">
                           {order.totalPrice.toLocaleString("ko-KR")}원
                         </td>
                         <td className="px-5 py-4">
-                          <Badge className={statusColor(order.status)} variant="outline">
+                          <Badge className={`text-sm px-2.5 py-1 ${statusColor(order.status)}`} variant="outline">
                             {translateOrderStatus(order.status)}
                           </Badge>
                         </td>
                         <td className="px-5 py-4 text-right">
                           <Link href={`/admin/orders/${order.id}`}>
                             <button className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 ml-auto">
-                              상세 <ChevronRight className="w-3.5 h-3.5" />
+                              상세 <ChevronRight className="w-4 h-4" />
                             </button>
                           </Link>
                         </td>
