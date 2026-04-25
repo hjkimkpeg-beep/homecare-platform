@@ -10,6 +10,7 @@ import openaiRouter from "./openai";
 import storageRouter from "./storage";
 import manualsRouter from "./manuals";
 import videosRouter from "./videos";
+import externalVideosRouter from "./external-videos";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(openaiRouter);
 router.use(storageRouter);
 router.use(manualsRouter);
 router.use(videosRouter);
+router.use(externalVideosRouter);
 
 export default router;

@@ -379,6 +379,33 @@ export interface CreateServiceManualBody {
   sortOrder?: number;
 }
 
+export interface ExternalVideo {
+  id: number;
+  packageId: string;
+  title: string;
+  videoType: string;
+  videoUrl?: string | null;
+  objectPath?: string | null;
+  description?: string | null;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateExternalVideoBody {
+  title: string;
+  videoType: string;
+  videoUrl?: string | null;
+  objectPath?: string | null;
+  description?: string | null;
+}
+
+export interface UpdateExternalVideoBody {
+  title?: string;
+  description?: string | null;
+  sortOrder?: number;
+}
+
 export interface PackageAiVideo {
   id: number;
   packageId: string;

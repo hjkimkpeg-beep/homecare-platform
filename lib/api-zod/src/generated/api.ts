@@ -812,6 +812,79 @@ export const DeleteServiceManualParams = zod.object({
 });
 
 /**
+ * @summary List external videos for a package
+ */
+export const ListExternalVideosParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const ListExternalVideosResponseItem = zod.object({
+  id: zod.number(),
+  packageId: zod.string(),
+  title: zod.string(),
+  videoType: zod.string(),
+  videoUrl: zod.string().nullish(),
+  objectPath: zod.string().nullish(),
+  description: zod.string().nullish(),
+  sortOrder: zod.number(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListExternalVideosResponse = zod.array(
+  ListExternalVideosResponseItem,
+);
+
+/**
+ * @summary Register a new external video for a package
+ */
+export const CreateExternalVideoParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const CreateExternalVideoBody = zod.object({
+  title: zod.string(),
+  videoType: zod.string(),
+  videoUrl: zod.string().nullish(),
+  objectPath: zod.string().nullish(),
+  description: zod.string().nullish(),
+});
+
+/**
+ * @summary Update an external video
+ */
+export const UpdateExternalVideoParams = zod.object({
+  packageId: zod.coerce.string(),
+  videoId: zod.coerce.number(),
+});
+
+export const UpdateExternalVideoBody = zod.object({
+  title: zod.string().optional(),
+  description: zod.string().nullish(),
+  sortOrder: zod.number().optional(),
+});
+
+export const UpdateExternalVideoResponse = zod.object({
+  id: zod.number(),
+  packageId: zod.string(),
+  title: zod.string(),
+  videoType: zod.string(),
+  videoUrl: zod.string().nullish(),
+  objectPath: zod.string().nullish(),
+  description: zod.string().nullish(),
+  sortOrder: zod.number(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Delete an external video
+ */
+export const DeleteExternalVideoParams = zod.object({
+  packageId: zod.coerce.string(),
+  videoId: zod.coerce.number(),
+});
+
+/**
  * @summary Trigger AI video script generation for a package
  */
 export const GeneratePackageVideoParams = zod.object({

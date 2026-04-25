@@ -643,6 +643,98 @@ paths:
         '204':
           description: Deleted
 
+  /packages/{packageId}/external-videos:
+    get:
+      tags: [manuals]
+      operationId: listExternalVideos
+      summary: List external videos for a package
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of external videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalVideo'
+    post:
+      tags: [manuals]
+      operationId: createExternalVideo
+      summary: Register a new external video for a package
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExternalVideoBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalVideo'
+
+  /packages/{packageId}/external-videos/{videoId}:
+    put:
+      tags: [manuals]
+      operationId: updateExternalVideo
+      summary: Update an external video
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: videoId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExternalVideoBody'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalVideo'
+    delete:
+      tags: [manuals]
+      operationId: deleteExternalVideo
+      summary: Delete an external video
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: videoId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+
   /packages/{packageId}/generate-video:
     post:
       tags: [manuals]
@@ -1402,6 +1494,74 @@ components:
         - fileType
         - objectPath
         - originalName
+
+    ExternalVideo:
+      type: object
+      properties:
+        id:
+          type: integer
+        packageId:
+          type: string
+        title:
+          type: string
+        videoType:
+          type: string
+        videoUrl:
+          type: string
+          nullable: true
+        objectPath:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - packageId
+        - title
+        - videoType
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    CreateExternalVideoBody:
+      type: object
+      properties:
+        title:
+          type: string
+        videoType:
+          type: string
+        videoUrl:
+          type: string
+          nullable: true
+        objectPath:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+      required:
+        - title
+        - videoType
+
+    UpdateExternalVideoBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
 
     PackageAiVideo:
       type: object

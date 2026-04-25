@@ -28,10 +28,12 @@ import type {
   AsRequest,
   AssignOrderBody,
   CreateAsRequestBody,
+  CreateExternalVideoBody,
   CreateOpenaiConversationBody,
   CreateOrderBody,
   CreateReviewBody,
   CreateServiceManualBody,
+  ExternalVideo,
   GenerateMarketingCopyBody,
   GeneratePackageVideo200,
   HealthStatus,
@@ -50,6 +52,7 @@ import type {
   ServiceManual,
   ServicePackage,
   ServicePackageDetail,
+  UpdateExternalVideoBody,
   UpdateOrderStatusBody,
   UploadUrlRequest,
   UploadUrlResponse,
@@ -2802,6 +2805,384 @@ export const useDeleteServiceManual = <
   TContext
 > => {
   return useMutation(getDeleteServiceManualMutationOptions(options));
+};
+
+/**
+ * @summary List external videos for a package
+ */
+export const getListExternalVideosUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/external-videos`;
+};
+
+export const listExternalVideos = async (
+  packageId: string,
+  options?: RequestInit,
+): Promise<ExternalVideo[]> => {
+  return customFetch<ExternalVideo[]>(getListExternalVideosUrl(packageId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListExternalVideosQueryKey = (packageId: string) => {
+  return [`/api/packages/${packageId}/external-videos`] as const;
+};
+
+export const getListExternalVideosQueryOptions = <
+  TData = Awaited<ReturnType<typeof listExternalVideos>>,
+  TError = ErrorType<unknown>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listExternalVideos>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListExternalVideosQueryKey(packageId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listExternalVideos>>
+  > = ({ signal }) =>
+    listExternalVideos(packageId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!packageId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listExternalVideos>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListExternalVideosQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listExternalVideos>>
+>;
+export type ListExternalVideosQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List external videos for a package
+ */
+
+export function useListExternalVideos<
+  TData = Awaited<ReturnType<typeof listExternalVideos>>,
+  TError = ErrorType<unknown>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listExternalVideos>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListExternalVideosQueryOptions(packageId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Register a new external video for a package
+ */
+export const getCreateExternalVideoUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/external-videos`;
+};
+
+export const createExternalVideo = async (
+  packageId: string,
+  createExternalVideoBody: CreateExternalVideoBody,
+  options?: RequestInit,
+): Promise<ExternalVideo> => {
+  return customFetch<ExternalVideo>(getCreateExternalVideoUrl(packageId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createExternalVideoBody),
+  });
+};
+
+export const getCreateExternalVideoMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createExternalVideo>>,
+    TError,
+    { packageId: string; data: BodyType<CreateExternalVideoBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createExternalVideo>>,
+  TError,
+  { packageId: string; data: BodyType<CreateExternalVideoBody> },
+  TContext
+> => {
+  const mutationKey = ["createExternalVideo"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createExternalVideo>>,
+    { packageId: string; data: BodyType<CreateExternalVideoBody> }
+  > = (props) => {
+    const { packageId, data } = props ?? {};
+
+    return createExternalVideo(packageId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateExternalVideoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createExternalVideo>>
+>;
+export type CreateExternalVideoMutationBody = BodyType<CreateExternalVideoBody>;
+export type CreateExternalVideoMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Register a new external video for a package
+ */
+export const useCreateExternalVideo = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createExternalVideo>>,
+    TError,
+    { packageId: string; data: BodyType<CreateExternalVideoBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createExternalVideo>>,
+  TError,
+  { packageId: string; data: BodyType<CreateExternalVideoBody> },
+  TContext
+> => {
+  return useMutation(getCreateExternalVideoMutationOptions(options));
+};
+
+/**
+ * @summary Update an external video
+ */
+export const getUpdateExternalVideoUrl = (
+  packageId: string,
+  videoId: number,
+) => {
+  return `/api/packages/${packageId}/external-videos/${videoId}`;
+};
+
+export const updateExternalVideo = async (
+  packageId: string,
+  videoId: number,
+  updateExternalVideoBody: UpdateExternalVideoBody,
+  options?: RequestInit,
+): Promise<ExternalVideo> => {
+  return customFetch<ExternalVideo>(
+    getUpdateExternalVideoUrl(packageId, videoId),
+    {
+      ...options,
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateExternalVideoBody),
+    },
+  );
+};
+
+export const getUpdateExternalVideoMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateExternalVideo>>,
+    TError,
+    {
+      packageId: string;
+      videoId: number;
+      data: BodyType<UpdateExternalVideoBody>;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateExternalVideo>>,
+  TError,
+  {
+    packageId: string;
+    videoId: number;
+    data: BodyType<UpdateExternalVideoBody>;
+  },
+  TContext
+> => {
+  const mutationKey = ["updateExternalVideo"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateExternalVideo>>,
+    {
+      packageId: string;
+      videoId: number;
+      data: BodyType<UpdateExternalVideoBody>;
+    }
+  > = (props) => {
+    const { packageId, videoId, data } = props ?? {};
+
+    return updateExternalVideo(packageId, videoId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateExternalVideoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateExternalVideo>>
+>;
+export type UpdateExternalVideoMutationBody = BodyType<UpdateExternalVideoBody>;
+export type UpdateExternalVideoMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update an external video
+ */
+export const useUpdateExternalVideo = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateExternalVideo>>,
+    TError,
+    {
+      packageId: string;
+      videoId: number;
+      data: BodyType<UpdateExternalVideoBody>;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateExternalVideo>>,
+  TError,
+  {
+    packageId: string;
+    videoId: number;
+    data: BodyType<UpdateExternalVideoBody>;
+  },
+  TContext
+> => {
+  return useMutation(getUpdateExternalVideoMutationOptions(options));
+};
+
+/**
+ * @summary Delete an external video
+ */
+export const getDeleteExternalVideoUrl = (
+  packageId: string,
+  videoId: number,
+) => {
+  return `/api/packages/${packageId}/external-videos/${videoId}`;
+};
+
+export const deleteExternalVideo = async (
+  packageId: string,
+  videoId: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteExternalVideoUrl(packageId, videoId), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteExternalVideoMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteExternalVideo>>,
+    TError,
+    { packageId: string; videoId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteExternalVideo>>,
+  TError,
+  { packageId: string; videoId: number },
+  TContext
+> => {
+  const mutationKey = ["deleteExternalVideo"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteExternalVideo>>,
+    { packageId: string; videoId: number }
+  > = (props) => {
+    const { packageId, videoId } = props ?? {};
+
+    return deleteExternalVideo(packageId, videoId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteExternalVideoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteExternalVideo>>
+>;
+
+export type DeleteExternalVideoMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete an external video
+ */
+export const useDeleteExternalVideo = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteExternalVideo>>,
+    TError,
+    { packageId: string; videoId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteExternalVideo>>,
+  TError,
+  { packageId: string; videoId: number },
+  TContext
+> => {
+  return useMutation(getDeleteExternalVideoMutationOptions(options));
 };
 
 /**

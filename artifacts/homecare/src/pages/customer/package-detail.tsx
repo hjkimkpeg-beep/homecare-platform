@@ -1,10 +1,11 @@
-import { useGetPackage, getGetPackageQueryKey, useGetPackageVideo } from "@workspace/api-client-react";
+import { useGetPackage, getGetPackageQueryKey, useGetPackageVideo, useListExternalVideos } from "@workspace/api-client-react";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Link, useRoute } from "wouter";
 import { formatCurrency } from "@/lib/format";
-import { Check, Minus, Clock, ShieldCheck, Info, Loader2, Sparkles } from "lucide-react";
+import { Check, Minus, Clock, ShieldCheck, Info, Loader2, Sparkles, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VideoPlayer, { VideoScene, VideoPlayerLoading } from "@/components/VideoPlayer";
+import ExternalVideoPlayer, { ExternalVideoItem } from "@/components/ExternalVideoPlayer";
 
 export default function PackageDetail() {
   const [, params] = useRoute("/packages/:id");
@@ -23,6 +24,10 @@ export default function PackageDetail() {
         return status === "pending" ? 3000 : false;
       },
     },
+  });
+
+  const { data: externalVideos } = useListExternalVideos(id, {
+    query: { enabled: !!id, retry: false },
   });
 
   const scenes = videoData?.script as VideoScene[] | null | undefined;
@@ -82,6 +87,27 @@ export default function PackageDetail() {
               ) : videoReady ? (
                 <VideoPlayer scenes={scenes!} packageName={pkg.name} />
               ) : null}
+            </section>
+          )}
+
+          {/* External Videos */}
+          {externalVideos && externalVideos.length > 0 && (
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <Film className="w-4 h-4 text-gray-600" />
+                <h2 className="text-lg font-bold text-gray-900">서비스 동영상</h2>
+              </div>
+              <div className="space-y-4">
+                {externalVideos.map((v) => (
+                  <div key={v.id}>
+                    <p className="text-sm font-medium text-gray-700 mb-2">{v.title}</p>
+                    <ExternalVideoPlayer video={v as ExternalVideoItem} />
+                    {v.description && (
+                      <p className="text-sm text-gray-500 mt-2">{v.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </section>
           )}
 

@@ -3,6 +3,7 @@ import {
   useListPackages,
   useListServiceManuals,
   useGetPackageVideo,
+  useListExternalVideos,
 } from "@workspace/api-client-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -18,9 +19,11 @@ import {
   BookOpen,
   LogOut,
   Sparkles,
+  Film,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VideoPlayer, { VideoScene, VideoPlayerLoading } from "@/components/VideoPlayer";
+import ExternalVideoPlayer, { ExternalVideoItem } from "@/components/ExternalVideoPlayer";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -57,8 +60,13 @@ function PackageManuals({ packageId, packageName }: { packageId: string; package
     },
   });
 
+  const { data: externalVideos } = useListExternalVideos(packageId, {
+    query: { enabled: expanded, retry: false },
+  });
+
   const scenes = videoData?.script as VideoScene[] | null | undefined;
   const videoReady = videoData?.status === "ready" && scenes && scenes.length > 0;
+  const hasExternalVideos = externalVideos && externalVideos.length > 0;
 
   return (
     <div className="border rounded-lg overflow-hidden">
@@ -73,6 +81,12 @@ function PackageManuals({ packageId, packageName }: { packageId: string; package
         )}
         <span>{packageName}</span>
         <div className="ml-auto flex items-center gap-2">
+          {hasExternalVideos && (
+            <span className="text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5 flex items-center gap-1">
+              <Film className="w-3 h-3" />
+              동영상 {externalVideos.length}개
+            </span>
+          )}
           {videoReady && (
             <span className="text-xs text-violet-600 bg-violet-50 border border-violet-200 rounded-full px-2 py-0.5 flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
@@ -101,6 +115,27 @@ function PackageManuals({ packageId, packageName }: { packageId: string; package
               <VideoPlayer scenes={scenes!} packageName={packageName} />
             </div>
           ) : null}
+
+          {/* External Videos */}
+          {hasExternalVideos && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Film className="w-4 h-4 text-blue-500" />
+                <span className="text-sm font-medium text-gray-700">서비스 동영상</span>
+              </div>
+              <div className="space-y-4">
+                {externalVideos!.map((v) => (
+                  <div key={v.id}>
+                    <p className="text-xs font-medium text-gray-500 mb-1.5">{v.title}</p>
+                    <ExternalVideoPlayer video={v as ExternalVideoItem} />
+                    {v.description && (
+                      <p className="text-xs text-gray-400 mt-1">{v.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Manuals list */}
           {isLoading ? (

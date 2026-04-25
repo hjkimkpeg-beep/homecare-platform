@@ -35,6 +35,7 @@ import PartnerJobDetail from "@/pages/partner/job-detail";
 import PartnerHistory from "@/pages/partner/history";
 import PartnerManuals from "@/pages/partner/manuals";
 import AdminManuals from "@/pages/admin/manuals";
+import AdminVideos from "@/pages/admin/videos";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -124,6 +125,9 @@ function Router() {
       </Route>
       <Route path="/admin/manuals">
         {() => <AdminGuard component={AdminManuals} />}
+      </Route>
+      <Route path="/admin/videos">
+        {() => <AdminGuard component={AdminVideos} />}
       </Route>
 
       {/* Partner */}
