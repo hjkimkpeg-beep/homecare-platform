@@ -8,3 +8,4 @@ export * from "./reviews";
 export * from "./conversations";
 export * from "./messages";
 export * from "./service-manuals";
+export * from "./package-videos";

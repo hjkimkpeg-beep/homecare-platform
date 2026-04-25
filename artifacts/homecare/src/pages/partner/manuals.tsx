@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { useListPackages, useListServiceManuals } from "@workspace/api-client-react";
+import {
+  useListPackages,
+  useListServiceManuals,
+  useGetPackageVideo,
+} from "@workspace/api-client-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -13,8 +17,10 @@ import {
   CheckCircle,
   BookOpen,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import VideoPlayer, { VideoScene, VideoPlayerLoading } from "@/components/VideoPlayer";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -40,6 +46,19 @@ function PackageManuals({ packageId, packageName }: { packageId: string; package
   const { data: manuals, isLoading } = useListServiceManuals(packageId, {
     query: { enabled: expanded },
   });
+  const { data: videoData, isLoading: videoLoading } = useGetPackageVideo(packageId, {
+    query: {
+      enabled: expanded,
+      retry: false,
+      refetchInterval: (query) => {
+        const status = (query.state.data as { status?: string } | undefined)?.status;
+        return status === "pending" ? 3000 : false;
+      },
+    },
+  });
+
+  const scenes = videoData?.script as VideoScene[] | null | undefined;
+  const videoReady = videoData?.status === "ready" && scenes && scenes.length > 0;
 
   return (
     <div className="border rounded-lg overflow-hidden">
@@ -53,43 +72,70 @@ function PackageManuals({ packageId, packageName }: { packageId: string; package
           <ChevronRight className="w-4 h-4 text-gray-500" />
         )}
         <span>{packageName}</span>
-        {manuals && (
-          <span className="ml-auto text-xs text-gray-400">{manuals.length}개</span>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {videoReady && (
+            <span className="text-xs text-violet-600 bg-violet-50 border border-violet-200 rounded-full px-2 py-0.5 flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              AI 동영상
+            </span>
+          )}
+          {manuals && (
+            <span className="text-xs text-gray-400">{manuals.length}개</span>
+          )}
+        </div>
       </button>
 
       {expanded && (
-        <div className="p-4">
+        <div className="p-4 space-y-4">
+          {/* AI Video */}
+          {videoLoading ? (
+            <VideoPlayerLoading />
+          ) : videoData?.status === "pending" ? (
+            <VideoPlayerLoading />
+          ) : videoReady ? (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-4 h-4 text-violet-500" />
+                <span className="text-sm font-medium text-violet-700">AI 서비스 안내 동영상</span>
+              </div>
+              <VideoPlayer scenes={scenes!} packageName={packageName} />
+            </div>
+          ) : null}
+
+          {/* Manuals list */}
           {isLoading ? (
             <div className="flex justify-center py-4">
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
             </div>
           ) : !manuals || manuals.length === 0 ? (
-            <p className="text-sm text-gray-400">등록된 매뉴얼이 없습니다.</p>
+            !videoReady && <p className="text-sm text-gray-400">등록된 매뉴얼이 없습니다.</p>
           ) : (
-            <ul className="space-y-2">
-              {manuals.map((m) => (
-                <li key={m.id} className="flex items-center gap-3 p-3 rounded-md bg-gray-50 border">
-                  {fileTypeIcon(m.fileType)}
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{m.title}</p>
-                    <p className="text-xs text-gray-400 truncate">
-                      {fileTypeLabel(m.fileType)}
-                      {m.fileSize ? ` · ${formatBytes(m.fileSize)}` : ""}
-                    </p>
-                  </div>
-                  <a
-                    href={`${BASE}/api/storage${m.objectPath}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:underline whitespace-nowrap"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    열기
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-2">첨부 파일</p>
+              <ul className="space-y-2">
+                {manuals.map((m) => (
+                  <li key={m.id} className="flex items-center gap-3 p-3 rounded-md bg-gray-50 border">
+                    {fileTypeIcon(m.fileType)}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm truncate">{m.title}</p>
+                      <p className="text-xs text-gray-400 truncate">
+                        {fileTypeLabel(m.fileType)}
+                        {m.fileSize ? ` · ${formatBytes(m.fileSize)}` : ""}
+                      </p>
+                    </div>
+                    <a
+                      href={`${BASE}/api/storage${m.objectPath}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-xs text-blue-600 hover:underline whitespace-nowrap"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      열기
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}
@@ -112,7 +158,7 @@ export default function PartnerManuals() {
       </header>
 
       <main className="flex-1 p-4 pb-20 space-y-4">
-        <p className="text-sm text-gray-500">서비스별 작업 매뉴얼 및 안내 자료를 확인하세요.</p>
+        <p className="text-sm text-gray-500">서비스별 작업 매뉴얼 및 AI 안내 동영상을 확인하세요.</p>
 
         {isLoading ? (
           <div className="flex justify-center py-20">

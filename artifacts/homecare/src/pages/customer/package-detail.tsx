@@ -1,9 +1,10 @@
-import { useGetPackage, getGetPackageQueryKey } from "@workspace/api-client-react";
+import { useGetPackage, getGetPackageQueryKey, useGetPackageVideo } from "@workspace/api-client-react";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Link, useRoute } from "wouter";
 import { formatCurrency } from "@/lib/format";
-import { Check, Minus, Clock, ShieldCheck, Info, Loader2 } from "lucide-react";
+import { Check, Minus, Clock, ShieldCheck, Info, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import VideoPlayer, { VideoScene, VideoPlayerLoading } from "@/components/VideoPlayer";
 
 export default function PackageDetail() {
   const [, params] = useRoute("/packages/:id");
@@ -12,6 +13,20 @@ export default function PackageDetail() {
   const { data: pkg, isLoading } = useGetPackage(id, {
     query: { enabled: !!id, queryKey: getGetPackageQueryKey(id) }
   });
+
+  const { data: videoData, isLoading: videoLoading } = useGetPackageVideo(id, {
+    query: {
+      enabled: !!id,
+      retry: false,
+      refetchInterval: (query) => {
+        const status = (query.state.data as { status?: string } | undefined)?.status;
+        return status === "pending" ? 3000 : false;
+      },
+    },
+  });
+
+  const scenes = videoData?.script as VideoScene[] | null | undefined;
+  const videoReady = videoData?.status === "ready" && scenes && scenes.length > 0;
 
   if (isLoading) {
     return (
@@ -53,6 +68,23 @@ export default function PackageDetail() {
         </div>
 
         <div className="p-4 space-y-8 pb-28">
+          {/* AI Video Section */}
+          {(videoLoading || videoData) && (
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-violet-500" />
+                <h2 className="text-lg font-bold text-gray-900">서비스 안내 동영상</h2>
+              </div>
+              {videoLoading ? (
+                <VideoPlayerLoading />
+              ) : videoData?.status === "pending" ? (
+                <VideoPlayerLoading />
+              ) : videoReady ? (
+                <VideoPlayer scenes={scenes!} packageName={pkg.name} />
+              ) : null}
+            </section>
+          )}
+
           {/* Tasks */}
           {pkg.tasks && pkg.tasks.length > 0 && (
             <section>

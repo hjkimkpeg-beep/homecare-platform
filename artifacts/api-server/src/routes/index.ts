@@ -9,6 +9,7 @@ import partnerRouter from "./partner";
 import openaiRouter from "./openai";
 import storageRouter from "./storage";
 import manualsRouter from "./manuals";
+import videosRouter from "./videos";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(partnerRouter);
 router.use(openaiRouter);
 router.use(storageRouter);
 router.use(manualsRouter);
+router.use(videosRouter);
 
 export default router;

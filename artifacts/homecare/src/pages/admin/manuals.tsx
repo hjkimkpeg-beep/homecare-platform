@@ -6,6 +6,9 @@ import {
   useCreateServiceManual,
   useDeleteServiceManual,
   useRequestUploadUrl,
+  useGeneratePackageVideo,
+  useGetPackageVideo,
+  getGetPackageVideoQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListServiceManualsQueryKey } from "@workspace/api-client-react";
@@ -18,10 +21,13 @@ import {
   ChevronDown,
   ChevronRight,
   CheckCircle2,
+  Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import VideoPlayer, { VideoScene, VideoPlayerLoading, VideoPlayerEmpty } from "@/components/VideoPlayer";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -40,6 +46,103 @@ function formatBytes(bytes?: number | null) {
   if (!bytes) return "";
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function AiVideoSection({ packageId, packageName }: { packageId: string; packageName: string }) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [generating, setGenerating] = useState(false);
+  const generateVideo = useGeneratePackageVideo();
+
+  const { data: videoData, isLoading: videoLoading, refetch } = useGetPackageVideo(packageId, {
+    query: {
+      retry: false,
+      refetchInterval: (query) => {
+        const status = (query.state.data as { status?: string } | undefined)?.status;
+        return status === "pending" ? 2000 : false;
+      },
+    },
+  });
+
+  async function handleGenerate() {
+    if (!confirm(`"${packageName}" 서비스의 AI 동영상 스크립트를 생성하시겠습니까?\n생성에는 10~20초 정도 소요됩니다.`)) return;
+    setGenerating(true);
+    try {
+      await generateVideo.mutateAsync({ packageId });
+      toast({ title: "AI 동영상 생성을 시작했습니다. 잠시 기다려주세요." });
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: getGetPackageVideoQueryKey(packageId) });
+        refetch();
+        setGenerating(false);
+      }, 2000);
+    } catch {
+      toast({ title: "생성 요청 실패", variant: "destructive" });
+      setGenerating(false);
+    }
+  }
+
+  const scenes = videoData?.script as VideoScene[] | null | undefined;
+  const status = videoData?.status;
+
+  return (
+    <div className="border-t pt-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="w-4 h-4 text-violet-500" />
+        <span className="font-medium text-sm">AI 자동 생성 동영상</span>
+        {status === "ready" && scenes && scenes.length > 0 && (
+          <span className="ml-auto text-xs text-green-600 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">생성 완료</span>
+        )}
+        {status === "error" && (
+          <span className="ml-auto text-xs text-red-600 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">오류</span>
+        )}
+      </div>
+
+      {videoLoading ? (
+        <VideoPlayerLoading />
+      ) : status === "pending" ? (
+        <VideoPlayerLoading />
+      ) : status === "ready" && scenes && scenes.length > 0 ? (
+        <div className="space-y-3">
+          <VideoPlayer scenes={scenes} packageName={packageName} />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleGenerate}
+            disabled={generating}
+            className="w-full text-violet-600 border-violet-200 hover:bg-violet-50"
+          >
+            {generating ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            다시 생성
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {status === "error" && (
+            <p className="text-xs text-red-500">
+              {(videoData as { errorMessage?: string } | undefined)?.errorMessage}
+            </p>
+          )}
+          <VideoPlayerEmpty />
+          <Button
+            onClick={handleGenerate}
+            disabled={generating}
+            className="w-full bg-violet-600 hover:bg-violet-700 text-white"
+          >
+            {generating ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : (
+              <Sparkles className="w-4 h-4 mr-2" />
+            )}
+            AI 동영상 자동 생성
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function PackageManuals({ packageId, packageName }: { packageId: string; packageName: string }) {
@@ -215,6 +318,8 @@ function PackageManuals({ packageId, packageName }: { packageId: string; package
               </Button>
             </div>
           </div>
+
+          <AiVideoSection packageId={packageId} packageName={packageName} />
         </div>
       )}
     </div>
@@ -229,7 +334,7 @@ export default function AdminManuals() {
       <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-4">
         <h1 className="text-xl font-bold">서비스 매뉴얼 관리</h1>
         <p className="text-sm text-gray-500">
-          패키지별로 PDF 또는 동영상 매뉴얼을 등록하고 관리합니다.
+          패키지별로 PDF/동영상 매뉴얼을 등록하고, AI 동영상을 자동 생성합니다.
         </p>
 
         {isLoading ? (

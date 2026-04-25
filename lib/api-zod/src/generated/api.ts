@@ -810,3 +810,32 @@ export const DeleteServiceManualParams = zod.object({
   packageId: zod.coerce.string(),
   manualId: zod.coerce.number(),
 });
+
+/**
+ * @summary Trigger AI video script generation for a package
+ */
+export const GeneratePackageVideoParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const GeneratePackageVideoResponse = zod.object({
+  status: zod.string(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Get AI-generated video script for a package
+ */
+export const GetPackageVideoParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const GetPackageVideoResponse = zod.object({
+  id: zod.number(),
+  packageId: zod.string(),
+  status: zod.string(),
+  script: zod.unknown().nullish(),
+  errorMessage: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});

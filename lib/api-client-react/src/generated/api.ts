@@ -33,6 +33,7 @@ import type {
   CreateReviewBody,
   CreateServiceManualBody,
   GenerateMarketingCopyBody,
+  GeneratePackageVideo200,
   HealthStatus,
   JobAssignment,
   ListOrdersParams,
@@ -42,6 +43,7 @@ import type {
   OpenaiConversationWithMessages,
   Order,
   OrderDetail,
+  PackageAiVideo,
   PartnerProfile,
   Review,
   SendOpenaiMessageBody,
@@ -2801,3 +2803,178 @@ export const useDeleteServiceManual = <
 > => {
   return useMutation(getDeleteServiceManualMutationOptions(options));
 };
+
+/**
+ * @summary Trigger AI video script generation for a package
+ */
+export const getGeneratePackageVideoUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/generate-video`;
+};
+
+export const generatePackageVideo = async (
+  packageId: string,
+  options?: RequestInit,
+): Promise<GeneratePackageVideo200> => {
+  return customFetch<GeneratePackageVideo200>(
+    getGeneratePackageVideoUrl(packageId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+export const getGeneratePackageVideoMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generatePackageVideo>>,
+    TError,
+    { packageId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generatePackageVideo>>,
+  TError,
+  { packageId: string },
+  TContext
+> => {
+  const mutationKey = ["generatePackageVideo"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generatePackageVideo>>,
+    { packageId: string }
+  > = (props) => {
+    const { packageId } = props ?? {};
+
+    return generatePackageVideo(packageId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GeneratePackageVideoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generatePackageVideo>>
+>;
+
+export type GeneratePackageVideoMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Trigger AI video script generation for a package
+ */
+export const useGeneratePackageVideo = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generatePackageVideo>>,
+    TError,
+    { packageId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generatePackageVideo>>,
+  TError,
+  { packageId: string },
+  TContext
+> => {
+  return useMutation(getGeneratePackageVideoMutationOptions(options));
+};
+
+/**
+ * @summary Get AI-generated video script for a package
+ */
+export const getGetPackageVideoUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/video`;
+};
+
+export const getPackageVideo = async (
+  packageId: string,
+  options?: RequestInit,
+): Promise<PackageAiVideo> => {
+  return customFetch<PackageAiVideo>(getGetPackageVideoUrl(packageId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetPackageVideoQueryKey = (packageId: string) => {
+  return [`/api/packages/${packageId}/video`] as const;
+};
+
+export const getGetPackageVideoQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPackageVideo>>,
+  TError = ErrorType<void>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getPackageVideo>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetPackageVideoQueryKey(packageId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPackageVideo>>> = ({
+    signal,
+  }) => getPackageVideo(packageId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!packageId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPackageVideo>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetPackageVideoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPackageVideo>>
+>;
+export type GetPackageVideoQueryError = ErrorType<void>;
+
+/**
+ * @summary Get AI-generated video script for a package
+ */
+
+export function useGetPackageVideo<
+  TData = Awaited<ReturnType<typeof getPackageVideo>>,
+  TError = ErrorType<void>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getPackageVideo>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetPackageVideoQueryOptions(packageId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}

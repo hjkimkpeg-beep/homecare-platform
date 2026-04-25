@@ -643,6 +643,54 @@ paths:
         '204':
           description: Deleted
 
+  /packages/{packageId}/generate-video:
+    post:
+      tags: [manuals]
+      operationId: generatePackageVideo
+      summary: Trigger AI video script generation for a package
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Generation started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - status
+                  - message
+
+  /packages/{packageId}/video:
+    get:
+      tags: [manuals]
+      operationId: getPackageVideo
+      summary: Get AI-generated video script for a package
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Video data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageAiVideo'
+        '404':
+          description: Not found
+
 
 
 components:
@@ -1354,3 +1402,30 @@ components:
         - fileType
         - objectPath
         - originalName
+
+    PackageAiVideo:
+      type: object
+      properties:
+        id:
+          type: integer
+        packageId:
+          type: string
+        status:
+          type: string
+        script:
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - packageId
+        - status
+        - createdAt
+        - updatedAt

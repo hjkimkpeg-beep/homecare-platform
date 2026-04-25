@@ -379,6 +379,16 @@ export interface CreateServiceManualBody {
   sortOrder?: number;
 }
 
+export interface PackageAiVideo {
+  id: number;
+  packageId: string;
+  status: string;
+  script?: unknown | null;
+  errorMessage?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type ListOrdersParams = {
   status?: string;
 };
@@ -399,4 +409,9 @@ export type AdminListPartnersParams = {
 
 export type AdminListAsRequestsParams = {
   status?: string;
+};
+
+export type GeneratePackageVideo200 = {
+  status: string;
+  message: string;
 };
