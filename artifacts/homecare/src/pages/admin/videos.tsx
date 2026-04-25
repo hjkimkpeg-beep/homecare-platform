@@ -91,9 +91,11 @@ function AddVideoForm({ packageId, onDone, currentCount }: AddVideoFormProps) {
           return;
         }
         const { uploadURL, objectPath } = await requestUploadUrl.mutateAsync({
-          name: file.name,
-          size: file.size,
-          contentType: file.type || "video/mp4",
+          data: {
+            name: file.name,
+            size: file.size,
+            contentType: file.type || "video/mp4",
+          },
         });
         const uploadRes = await fetch(uploadURL, {
           method: "PUT",

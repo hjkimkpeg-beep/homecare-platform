@@ -93,9 +93,11 @@ function StandardManualSection({ packageId, packageName }: { packageId: string; 
     setUploading(true);
     try {
       const { uploadURL, objectPath } = await requestUploadUrl.mutateAsync({
-        name: file.name,
-        size: file.size,
-        contentType: file.type || "application/octet-stream",
+        data: {
+          name: file.name,
+          size: file.size,
+          contentType: file.type || "application/octet-stream",
+        },
       });
       const uploadRes = await fetch(uploadURL, {
         method: "PUT",
@@ -355,9 +357,11 @@ function PackageManuals({ packageId, packageName }: { packageId: string; package
     setUploading(true);
     try {
       const { uploadURL, objectPath } = await requestUploadUrl.mutateAsync({
-        name: file.name,
-        size: file.size,
-        contentType: file.type || "application/octet-stream",
+        data: {
+          name: file.name,
+          size: file.size,
+          contentType: file.type || "application/octet-stream",
+        },
       });
       const uploadRes = await fetch(uploadURL, {
         method: "PUT",
