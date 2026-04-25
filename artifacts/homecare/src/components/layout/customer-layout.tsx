@@ -10,8 +10,8 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
 
   const navItems = [
     { href: "/", label: "홈", icon: Home },
-    { href: "/orders", label: "주문내역", icon: ClipboardList },
-    { href: "/as-requests", label: "A/S요청", icon: Wrench },
+    { href: "/orders", label: "주문", icon: ClipboardList },
+    { href: "/as-requests", label: "A/S", icon: Wrench },
   ];
 
   const isCustomerArea =

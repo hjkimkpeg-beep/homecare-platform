@@ -124,7 +124,7 @@ export function ChatbotWidget() {
   return (
     <>
       {open && (
-        <div className="fixed bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-32px)] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
+        <div className="fixed bottom-[88px] md:bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-32px)] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
           style={{ height: "480px" }}>
           <div className="bg-[#0f1729] px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -208,7 +208,7 @@ export function ChatbotWidget() {
 
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full bg-[#0f1729] hover:bg-blue-800 shadow-lg flex items-center justify-center transition-all active:scale-95"
+        className="fixed bottom-[72px] md:bottom-4 right-4 z-50 w-14 h-14 rounded-full bg-[#0f1729] hover:bg-blue-800 shadow-lg flex items-center justify-center transition-all active:scale-95"
         data-testid="chatbot-toggle"
         aria-label="AI 상담사 열기"
       >
