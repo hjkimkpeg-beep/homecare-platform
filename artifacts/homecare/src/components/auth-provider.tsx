@@ -19,9 +19,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useLogout();
 
   const handleLogout = () => {
+    const role = user?.role;
     logoutMutation.mutate(undefined, {
       onSuccess: () => {
-        window.location.href = "/login";
+        if (role === "admin" || role === "operator") {
+          window.location.href = "/admin/login";
+        } else if (role === "partner") {
+          window.location.href = "/partner/login";
+        } else {
+          window.location.href = "/";
+        }
       }
     });
   };
