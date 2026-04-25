@@ -11,6 +11,7 @@ import storageRouter from "./storage";
 import manualsRouter from "./manuals";
 import videosRouter from "./videos";
 import externalVideosRouter from "./external-videos";
+import standardManualsRouter from "./standard-manuals";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(storageRouter);
 router.use(manualsRouter);
 router.use(videosRouter);
 router.use(externalVideosRouter);
+router.use(standardManualsRouter);
 
 export default router;

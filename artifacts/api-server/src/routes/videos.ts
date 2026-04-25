@@ -1,14 +1,21 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
-import { db, packageAiVideosTable, servicePackagesTable, packageTasksTable } from "@workspace/db";
+import {
+  db,
+  packageAiVideosTable,
+  servicePackagesTable,
+  packageTasksTable,
+  packageStandardManualsTable,
+} from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { requireAdmin } from "../middlewares/auth";
+import { extractTextFromManual } from "../lib/extractManualText";
 import "../lib/session";
 
 const router: IRouter = Router();
 
 const VIDEO_SCRIPT_PROMPT = `당신은 홈케어 서비스 교육 영상 전문가입니다.
-아래 서비스 패키지 정보를 기반으로, 파트너(기술자)와 고객 모두가 이해할 수 있는
+아래 서비스 매뉴얼 내용을 기반으로, 파트너(기술자)와 고객 모두가 이해할 수 있는
 6단계 서비스 안내 영상 스크립트를 JSON 배열로 작성해주세요.
 
 응답은 반드시 순수 JSON 배열만 출력하세요. 다른 텍스트는 포함하지 마세요.
@@ -45,11 +52,6 @@ router.post(
       return;
     }
 
-    const tasks = await db
-      .select()
-      .from(packageTasksTable)
-      .where(eq(packageTasksTable.packageId, packageId));
-
     const [existing] = await db
       .select()
       .from(packageAiVideosTable)
@@ -66,21 +68,47 @@ router.post(
 
     res.json({ status: "pending", message: "동영상 스크립트 생성을 시작했습니다" });
 
-    const packageInfo = `
-패키지명: ${pkg.name}
-설명: ${pkg.description}
-소요시간: ${pkg.estimatedMinutes}분
-A/S 보증: ${pkg.asWarrantyDays}일
-주요 작업: ${tasks.map((t) => t.task).join(", ")}
-가격: ${pkg.basePrice.toLocaleString("ko-KR")}원`;
-
     try {
+      const [standardManual] = await db
+        .select()
+        .from(packageStandardManualsTable)
+        .where(eq(packageStandardManualsTable.packageId, packageId));
+
+      let contentForAI: string;
+      let sourceLabel: string;
+
+      if (standardManual) {
+        try {
+          const extractedText = await extractTextFromManual(
+            standardManual.objectPath,
+            standardManual.fileType,
+          );
+          const truncated = extractedText.slice(0, 8000);
+          contentForAI = `서비스명: ${pkg.name}\n\n[표준 매뉴얼 내용]\n${truncated}`;
+          sourceLabel = `표준 매뉴얼(${standardManual.originalName}) 기반`;
+        } catch (extractErr) {
+          const tasks = await db
+            .select()
+            .from(packageTasksTable)
+            .where(eq(packageTasksTable.packageId, packageId));
+          contentForAI = `패키지명: ${pkg.name}\n설명: ${pkg.description}\n소요시간: ${pkg.estimatedMinutes}분\n주요 작업: ${tasks.map((t) => t.task).join(", ")}`;
+          sourceLabel = "패키지 정보 기반 (매뉴얼 추출 실패)";
+        }
+      } else {
+        const tasks = await db
+          .select()
+          .from(packageTasksTable)
+          .where(eq(packageTasksTable.packageId, packageId));
+        contentForAI = `패키지명: ${pkg.name}\n설명: ${pkg.description}\n소요시간: ${pkg.estimatedMinutes}분\nA/S 보증: ${pkg.asWarrantyDays}일\n주요 작업: ${tasks.map((t) => t.task).join(", ")}\n가격: ${pkg.basePrice.toLocaleString("ko-KR")}원`;
+        sourceLabel = "패키지 정보 기반";
+      }
+
       const completion = await openai.chat.completions.create({
         model: "gpt-4.1",
         max_completion_tokens: 2048,
         messages: [
           { role: "system", content: VIDEO_SCRIPT_PROMPT },
-          { role: "user", content: packageInfo },
+          { role: "user", content: contentForAI },
         ],
       });
 

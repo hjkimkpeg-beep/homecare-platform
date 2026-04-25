@@ -812,6 +812,47 @@ export const DeleteServiceManualParams = zod.object({
 });
 
 /**
+ * @summary Get the standard manual for a package
+ */
+export const GetStandardManualParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const GetStandardManualResponse = zod.object({
+  id: zod.number(),
+  packageId: zod.string(),
+  title: zod.string(),
+  fileType: zod.string(),
+  objectPath: zod.string(),
+  originalName: zod.string(),
+  fileSize: zod.number().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Register a standard manual for a package
+ */
+export const CreateStandardManualParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+export const CreateStandardManualBody = zod.object({
+  title: zod.string(),
+  fileType: zod.string(),
+  objectPath: zod.string(),
+  originalName: zod.string(),
+  fileSize: zod.number().nullish(),
+});
+
+/**
+ * @summary Delete the standard manual for a package
+ */
+export const DeleteStandardManualParams = zod.object({
+  packageId: zod.coerce.string(),
+});
+
+/**
  * @summary List external videos for a package
  */
 export const ListExternalVideosParams = zod.object({

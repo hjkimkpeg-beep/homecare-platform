@@ -379,6 +379,26 @@ export interface CreateServiceManualBody {
   sortOrder?: number;
 }
 
+export interface StandardManual {
+  id: number;
+  packageId: string;
+  title: string;
+  fileType: string;
+  objectPath: string;
+  originalName: string;
+  fileSize?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateStandardManualBody {
+  title: string;
+  fileType: string;
+  objectPath: string;
+  originalName: string;
+  fileSize?: number | null;
+}
+
 export interface ExternalVideo {
   id: number;
   packageId: string;

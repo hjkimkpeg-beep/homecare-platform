@@ -25,3 +25,20 @@ export const insertServiceManualSchema = createInsertSchema(serviceManualsTable)
 
 export type ServiceManual = typeof serviceManualsTable.$inferSelect;
 export type InsertServiceManual = z.infer<typeof insertServiceManualSchema>;
+
+export const packageStandardManualsTable = pgTable("package_standard_manuals", {
+  id: serial("id").primaryKey(),
+  packageId: uuid("package_id")
+    .notNull()
+    .unique()
+    .references(() => servicePackagesTable.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  fileType: varchar("file_type", { length: 100 }).notNull(),
+  objectPath: text("object_path").notNull(),
+  originalName: text("original_name").notNull(),
+  fileSize: integer("file_size"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type PackageStandardManual = typeof packageStandardManualsTable.$inferSelect;

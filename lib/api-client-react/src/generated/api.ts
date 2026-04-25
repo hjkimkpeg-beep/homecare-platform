@@ -33,6 +33,7 @@ import type {
   CreateOrderBody,
   CreateReviewBody,
   CreateServiceManualBody,
+  CreateStandardManualBody,
   ExternalVideo,
   GenerateMarketingCopyBody,
   GeneratePackageVideo200,
@@ -52,6 +53,7 @@ import type {
   ServiceManual,
   ServicePackage,
   ServicePackageDetail,
+  StandardManual,
   UpdateExternalVideoBody,
   UpdateOrderStatusBody,
   UploadUrlRequest,
@@ -2805,6 +2807,267 @@ export const useDeleteServiceManual = <
   TContext
 > => {
   return useMutation(getDeleteServiceManualMutationOptions(options));
+};
+
+/**
+ * @summary Get the standard manual for a package
+ */
+export const getGetStandardManualUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/standard-manual`;
+};
+
+export const getStandardManual = async (
+  packageId: string,
+  options?: RequestInit,
+): Promise<StandardManual> => {
+  return customFetch<StandardManual>(getGetStandardManualUrl(packageId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetStandardManualQueryKey = (packageId: string) => {
+  return [`/api/packages/${packageId}/standard-manual`] as const;
+};
+
+export const getGetStandardManualQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStandardManual>>,
+  TError = ErrorType<void>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getStandardManual>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStandardManualQueryKey(packageId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStandardManual>>
+  > = ({ signal }) =>
+    getStandardManual(packageId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!packageId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStandardManual>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetStandardManualQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStandardManual>>
+>;
+export type GetStandardManualQueryError = ErrorType<void>;
+
+/**
+ * @summary Get the standard manual for a package
+ */
+
+export function useGetStandardManual<
+  TData = Awaited<ReturnType<typeof getStandardManual>>,
+  TError = ErrorType<void>,
+>(
+  packageId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getStandardManual>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetStandardManualQueryOptions(packageId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Register a standard manual for a package
+ */
+export const getCreateStandardManualUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/standard-manual`;
+};
+
+export const createStandardManual = async (
+  packageId: string,
+  createStandardManualBody: CreateStandardManualBody,
+  options?: RequestInit,
+): Promise<StandardManual> => {
+  return customFetch<StandardManual>(getCreateStandardManualUrl(packageId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createStandardManualBody),
+  });
+};
+
+export const getCreateStandardManualMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createStandardManual>>,
+    TError,
+    { packageId: string; data: BodyType<CreateStandardManualBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createStandardManual>>,
+  TError,
+  { packageId: string; data: BodyType<CreateStandardManualBody> },
+  TContext
+> => {
+  const mutationKey = ["createStandardManual"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createStandardManual>>,
+    { packageId: string; data: BodyType<CreateStandardManualBody> }
+  > = (props) => {
+    const { packageId, data } = props ?? {};
+
+    return createStandardManual(packageId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateStandardManualMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createStandardManual>>
+>;
+export type CreateStandardManualMutationBody =
+  BodyType<CreateStandardManualBody>;
+export type CreateStandardManualMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Register a standard manual for a package
+ */
+export const useCreateStandardManual = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createStandardManual>>,
+    TError,
+    { packageId: string; data: BodyType<CreateStandardManualBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createStandardManual>>,
+  TError,
+  { packageId: string; data: BodyType<CreateStandardManualBody> },
+  TContext
+> => {
+  return useMutation(getCreateStandardManualMutationOptions(options));
+};
+
+/**
+ * @summary Delete the standard manual for a package
+ */
+export const getDeleteStandardManualUrl = (packageId: string) => {
+  return `/api/packages/${packageId}/standard-manual`;
+};
+
+export const deleteStandardManual = async (
+  packageId: string,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteStandardManualUrl(packageId), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteStandardManualMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteStandardManual>>,
+    TError,
+    { packageId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteStandardManual>>,
+  TError,
+  { packageId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteStandardManual"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteStandardManual>>,
+    { packageId: string }
+  > = (props) => {
+    const { packageId } = props ?? {};
+
+    return deleteStandardManual(packageId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteStandardManualMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteStandardManual>>
+>;
+
+export type DeleteStandardManualMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete the standard manual for a package
+ */
+export const useDeleteStandardManual = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteStandardManual>>,
+    TError,
+    { packageId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteStandardManual>>,
+  TError,
+  { packageId: string },
+  TContext
+> => {
+  return useMutation(getDeleteStandardManualMutationOptions(options));
 };
 
 /**
