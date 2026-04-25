@@ -61,7 +61,31 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0f1729] flex flex-col items-center justify-center px-4">
+    <div className="min-h-[100dvh] bg-[#0f1729] flex flex-col">
+      {/* Top navigation */}
+      <header className="w-full flex items-center justify-between px-6 py-3 border-b border-white/10">
+        <Link href="/">
+          <div className="flex items-center gap-2 cursor-pointer">
+            <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
+              <KeyRound className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-white text-base">HomeCare</span>
+          </div>
+        </Link>
+        <nav className="flex items-center gap-1">
+          <Link href="/">
+            <span className="px-4 py-1.5 rounded-full text-sm font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">고객</span>
+          </Link>
+          <Link href="/admin/login">
+            <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-white/20 text-white cursor-pointer">관리자</span>
+          </Link>
+          <Link href="/partner/login">
+            <span className="px-4 py-1.5 rounded-full text-sm font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">파트너</span>
+          </Link>
+        </nav>
+      </header>
+
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
@@ -134,6 +158,7 @@ export default function AdminLogin() {
             <span className="text-gray-600 text-sm hover:text-gray-400 cursor-pointer transition-colors">← 고객 홈으로</span>
           </Link>
         </div>
+      </div>
       </div>
     </div>
   );
