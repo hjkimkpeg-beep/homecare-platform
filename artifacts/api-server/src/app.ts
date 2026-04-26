@@ -3,6 +3,7 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+import path from "path";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -48,5 +49,15 @@ app.use(
 );
 
 app.use("/api", router);
+
+// In production, serve the built frontend static files
+if (process.env.NODE_ENV === "production") {
+  const staticDir = path.join(process.cwd(), "artifacts/homecare/dist/public");
+  app.use(express.static(staticDir));
+  // SPA fallback: serve index.html for any route not handled above
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(staticDir, "index.html"));
+  });
+}
 
 export default app;
