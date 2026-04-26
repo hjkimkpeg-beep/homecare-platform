@@ -1489,3 +1489,117 @@ export const MarkSmsSentResponse = zod.object({
   metadata: zod.object({}).passthrough().nullish(),
   createdAt: zod.string(),
 });
+
+/**
+ * @summary Submit a remote diagnosis request
+ */
+export const CreateDiagnosisRequestBody = zod.object({
+  customerName: zod.string(),
+  phone: zod.string(),
+  address: zod.string(),
+  preferredDate: zod.string().optional(),
+  isUrgent: zod.string(),
+  problemType: zod.enum([
+    "leak",
+    "drain",
+    "boiler",
+    "aircon",
+    "electrical",
+    "other",
+  ]),
+  description: zod.string().optional(),
+  checklistAnswers: zod.object({}).passthrough().optional(),
+  uploadedFiles: zod.array(zod.object({}).passthrough()).optional(),
+});
+
+/**
+ * @summary List all remote diagnosis requests (admin)
+ */
+export const ListDiagnosisRequestsQueryParams = zod.object({
+  status: zod.coerce.string().optional(),
+  problemType: zod.coerce.string().optional(),
+});
+
+export const ListDiagnosisRequestsResponseItem = zod.object({
+  id: zod.string(),
+  customerName: zod.string(),
+  phone: zod.string(),
+  address: zod.string(),
+  preferredDate: zod.string().nullish(),
+  isUrgent: zod.string(),
+  problemType: zod.enum([
+    "leak",
+    "drain",
+    "boiler",
+    "aircon",
+    "electrical",
+    "other",
+  ]),
+  description: zod.string().nullish(),
+  checklistAnswers: zod.object({}).passthrough().nullish(),
+  uploadedFiles: zod.array(zod.object({}).passthrough()).nullish(),
+  diagnosisResult: zod.object({}).passthrough().nullish(),
+  estimatedCost: zod.string().nullish(),
+  urgency: zod.string().nullish(),
+  status: zod.enum([
+    "received",
+    "reviewing",
+    "visit_scheduled",
+    "completed",
+    "cancelled",
+  ]),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListDiagnosisRequestsResponse = zod.array(
+  ListDiagnosisRequestsResponseItem,
+);
+
+/**
+ * @summary Update diagnosis request status (admin)
+ */
+export const UpdateDiagnosisStatusParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const UpdateDiagnosisStatusBody = zod.object({
+  status: zod.enum([
+    "received",
+    "reviewing",
+    "visit_scheduled",
+    "completed",
+    "cancelled",
+  ]),
+});
+
+export const UpdateDiagnosisStatusResponse = zod.object({
+  id: zod.string(),
+  customerName: zod.string(),
+  phone: zod.string(),
+  address: zod.string(),
+  preferredDate: zod.string().nullish(),
+  isUrgent: zod.string(),
+  problemType: zod.enum([
+    "leak",
+    "drain",
+    "boiler",
+    "aircon",
+    "electrical",
+    "other",
+  ]),
+  description: zod.string().nullish(),
+  checklistAnswers: zod.object({}).passthrough().nullish(),
+  uploadedFiles: zod.array(zod.object({}).passthrough()).nullish(),
+  diagnosisResult: zod.object({}).passthrough().nullish(),
+  estimatedCost: zod.string().nullish(),
+  urgency: zod.string().nullish(),
+  status: zod.enum([
+    "received",
+    "reviewing",
+    "visit_scheduled",
+    "completed",
+    "cancelled",
+  ]),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});

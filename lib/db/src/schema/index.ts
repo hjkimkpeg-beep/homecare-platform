@@ -13,3 +13,4 @@ export * from "./board";
 export * from "./projects";
 export * from "./contracts";
 export * from "./notifications";
+export * from "./diagnosis";

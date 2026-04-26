@@ -627,6 +627,99 @@ export interface SmsNotification {
   createdAt: string;
 }
 
+export type DiagnosisRequestProblemType =
+  (typeof DiagnosisRequestProblemType)[keyof typeof DiagnosisRequestProblemType];
+
+export const DiagnosisRequestProblemType = {
+  leak: "leak",
+  drain: "drain",
+  boiler: "boiler",
+  aircon: "aircon",
+  electrical: "electrical",
+  other: "other",
+} as const;
+
+export type DiagnosisRequestChecklistAnswers = {
+  [key: string]: unknown;
+} | null;
+
+export type DiagnosisRequestUploadedFilesItem = { [key: string]: unknown };
+
+export type DiagnosisRequestDiagnosisResult = { [key: string]: unknown } | null;
+
+export type DiagnosisRequestStatus =
+  (typeof DiagnosisRequestStatus)[keyof typeof DiagnosisRequestStatus];
+
+export const DiagnosisRequestStatus = {
+  received: "received",
+  reviewing: "reviewing",
+  visit_scheduled: "visit_scheduled",
+  completed: "completed",
+  cancelled: "cancelled",
+} as const;
+
+export interface DiagnosisRequest {
+  id: string;
+  customerName: string;
+  phone: string;
+  address: string;
+  preferredDate?: string | null;
+  isUrgent: string;
+  problemType: DiagnosisRequestProblemType;
+  description?: string | null;
+  checklistAnswers?: DiagnosisRequestChecklistAnswers;
+  uploadedFiles?: DiagnosisRequestUploadedFilesItem[] | null;
+  diagnosisResult?: DiagnosisRequestDiagnosisResult;
+  estimatedCost?: string | null;
+  urgency?: string | null;
+  status: DiagnosisRequestStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CreateDiagnosisBodyProblemType =
+  (typeof CreateDiagnosisBodyProblemType)[keyof typeof CreateDiagnosisBodyProblemType];
+
+export const CreateDiagnosisBodyProblemType = {
+  leak: "leak",
+  drain: "drain",
+  boiler: "boiler",
+  aircon: "aircon",
+  electrical: "electrical",
+  other: "other",
+} as const;
+
+export type CreateDiagnosisBodyChecklistAnswers = { [key: string]: unknown };
+
+export type CreateDiagnosisBodyUploadedFilesItem = { [key: string]: unknown };
+
+export interface CreateDiagnosisBody {
+  customerName: string;
+  phone: string;
+  address: string;
+  preferredDate?: string;
+  isUrgent: string;
+  problemType: CreateDiagnosisBodyProblemType;
+  description?: string;
+  checklistAnswers?: CreateDiagnosisBodyChecklistAnswers;
+  uploadedFiles?: CreateDiagnosisBodyUploadedFilesItem[];
+}
+
+export type UpdateDiagnosisStatusBodyStatus =
+  (typeof UpdateDiagnosisStatusBodyStatus)[keyof typeof UpdateDiagnosisStatusBodyStatus];
+
+export const UpdateDiagnosisStatusBodyStatus = {
+  received: "received",
+  reviewing: "reviewing",
+  visit_scheduled: "visit_scheduled",
+  completed: "completed",
+  cancelled: "cancelled",
+} as const;
+
+export interface UpdateDiagnosisStatusBody {
+  status: UpdateDiagnosisStatusBodyStatus;
+}
+
 export type ListOrdersParams = {
   status?: string;
 };
@@ -685,4 +778,9 @@ export type ListProjectsParams = {
 export type ListSmsNotificationsParams = {
   isSent?: boolean;
   type?: string;
+};
+
+export type ListDiagnosisRequestsParams = {
+  status?: string;
+  problemType?: string;
 };

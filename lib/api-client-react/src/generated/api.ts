@@ -38,6 +38,7 @@ import type {
   CreateBoardCommentBody,
   CreateBoardPostBody,
   CreateContractTemplateBody,
+  CreateDiagnosisBody,
   CreateExternalVideoBody,
   CreateOpenaiConversationBody,
   CreateOrderBody,
@@ -45,6 +46,7 @@ import type {
   CreateReviewBody,
   CreateServiceManualBody,
   CreateStandardManualBody,
+  DiagnosisRequest,
   ExternalVideo,
   GenerateBoardAiReply200,
   GenerateMarketingCopyBody,
@@ -53,6 +55,7 @@ import type {
   JobAssignment,
   ListBoardNotificationsParams,
   ListBoardPostsParams,
+  ListDiagnosisRequestsParams,
   ListOrdersParams,
   ListProjectsParams,
   ListSmsNotificationsParams,
@@ -77,6 +80,7 @@ import type {
   UpdateBoardPostBody,
   UpdateBoardPostStatusBody,
   UpdateContractTemplateBody,
+  UpdateDiagnosisStatusBody,
   UpdateExternalVideoBody,
   UpdateOrderStatusBody,
   UpdateProjectBody,
@@ -6005,4 +6009,278 @@ export const useMarkSmsSent = <
   TContext
 > => {
   return useMutation(getMarkSmsSentMutationOptions(options));
+};
+
+/**
+ * @summary Submit a remote diagnosis request
+ */
+export const getCreateDiagnosisRequestUrl = () => {
+  return `/api/diagnosis`;
+};
+
+export const createDiagnosisRequest = async (
+  createDiagnosisBody: CreateDiagnosisBody,
+  options?: RequestInit,
+): Promise<DiagnosisRequest> => {
+  return customFetch<DiagnosisRequest>(getCreateDiagnosisRequestUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createDiagnosisBody),
+  });
+};
+
+export const getCreateDiagnosisRequestMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createDiagnosisRequest>>,
+    TError,
+    { data: BodyType<CreateDiagnosisBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createDiagnosisRequest>>,
+  TError,
+  { data: BodyType<CreateDiagnosisBody> },
+  TContext
+> => {
+  const mutationKey = ["createDiagnosisRequest"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createDiagnosisRequest>>,
+    { data: BodyType<CreateDiagnosisBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createDiagnosisRequest(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateDiagnosisRequestMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createDiagnosisRequest>>
+>;
+export type CreateDiagnosisRequestMutationBody = BodyType<CreateDiagnosisBody>;
+export type CreateDiagnosisRequestMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Submit a remote diagnosis request
+ */
+export const useCreateDiagnosisRequest = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createDiagnosisRequest>>,
+    TError,
+    { data: BodyType<CreateDiagnosisBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createDiagnosisRequest>>,
+  TError,
+  { data: BodyType<CreateDiagnosisBody> },
+  TContext
+> => {
+  return useMutation(getCreateDiagnosisRequestMutationOptions(options));
+};
+
+/**
+ * @summary List all remote diagnosis requests (admin)
+ */
+export const getListDiagnosisRequestsUrl = (
+  params?: ListDiagnosisRequestsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/admin/diagnosis?${stringifiedParams}`
+    : `/api/admin/diagnosis`;
+};
+
+export const listDiagnosisRequests = async (
+  params?: ListDiagnosisRequestsParams,
+  options?: RequestInit,
+): Promise<DiagnosisRequest[]> => {
+  return customFetch<DiagnosisRequest[]>(getListDiagnosisRequestsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListDiagnosisRequestsQueryKey = (
+  params?: ListDiagnosisRequestsParams,
+) => {
+  return [`/api/admin/diagnosis`, ...(params ? [params] : [])] as const;
+};
+
+export const getListDiagnosisRequestsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listDiagnosisRequests>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListDiagnosisRequestsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listDiagnosisRequests>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListDiagnosisRequestsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listDiagnosisRequests>>
+  > = ({ signal }) =>
+    listDiagnosisRequests(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listDiagnosisRequests>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListDiagnosisRequestsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listDiagnosisRequests>>
+>;
+export type ListDiagnosisRequestsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all remote diagnosis requests (admin)
+ */
+
+export function useListDiagnosisRequests<
+  TData = Awaited<ReturnType<typeof listDiagnosisRequests>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListDiagnosisRequestsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listDiagnosisRequests>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListDiagnosisRequestsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Update diagnosis request status (admin)
+ */
+export const getUpdateDiagnosisStatusUrl = (id: string) => {
+  return `/api/admin/diagnosis/${id}/status`;
+};
+
+export const updateDiagnosisStatus = async (
+  id: string,
+  updateDiagnosisStatusBody: UpdateDiagnosisStatusBody,
+  options?: RequestInit,
+): Promise<DiagnosisRequest> => {
+  return customFetch<DiagnosisRequest>(getUpdateDiagnosisStatusUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateDiagnosisStatusBody),
+  });
+};
+
+export const getUpdateDiagnosisStatusMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateDiagnosisStatus>>,
+    TError,
+    { id: string; data: BodyType<UpdateDiagnosisStatusBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateDiagnosisStatus>>,
+  TError,
+  { id: string; data: BodyType<UpdateDiagnosisStatusBody> },
+  TContext
+> => {
+  const mutationKey = ["updateDiagnosisStatus"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateDiagnosisStatus>>,
+    { id: string; data: BodyType<UpdateDiagnosisStatusBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateDiagnosisStatus(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateDiagnosisStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateDiagnosisStatus>>
+>;
+export type UpdateDiagnosisStatusMutationBody =
+  BodyType<UpdateDiagnosisStatusBody>;
+export type UpdateDiagnosisStatusMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update diagnosis request status (admin)
+ */
+export const useUpdateDiagnosisStatus = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateDiagnosisStatus>>,
+    TError,
+    { id: string; data: BodyType<UpdateDiagnosisStatusBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateDiagnosisStatus>>,
+  TError,
+  { id: string; data: BodyType<UpdateDiagnosisStatusBody> },
+  TContext
+> => {
+  return useMutation(getUpdateDiagnosisStatusMutationOptions(options));
 };

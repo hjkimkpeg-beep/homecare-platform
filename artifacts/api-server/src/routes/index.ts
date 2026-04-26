@@ -16,6 +16,7 @@ import boardRouter from "./board";
 import projectsRouter from "./projects";
 import contractsRouter from "./contracts";
 import notificationsRouter from "./notifications";
+import diagnosisRouter from "./diagnosis";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(boardRouter);
 router.use(projectsRouter);
 router.use(contractsRouter);
 router.use(notificationsRouter);
+router.use(diagnosisRouter);
 
 export default router;

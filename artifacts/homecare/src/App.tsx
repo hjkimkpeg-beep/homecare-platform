@@ -42,7 +42,9 @@ import AdminResources from "@/pages/admin/resources";
 import AdminProjects from "@/pages/admin/projects";
 import AdminContracts from "@/pages/admin/contracts";
 import AdminSms from "@/pages/admin/sms";
+import AdminDiagnosis from "@/pages/admin/diagnosis";
 import CustomerResources from "@/pages/customer/resources";
+import RemoteDiagnosis from "@/pages/customer/remote-diagnosis";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -113,6 +115,9 @@ function Router() {
       <Route path="/resources">
         {() => <CustomerGuard component={CustomerResources} />}
       </Route>
+      <Route path="/remote-diagnosis">
+        {() => <CustomerGuard component={RemoteDiagnosis} />}
+      </Route>
 
       {/* Admin */}
       <Route path="/admin">
@@ -156,6 +161,9 @@ function Router() {
       </Route>
       <Route path="/admin/sms">
         {() => <AdminGuard component={AdminSms} />}
+      </Route>
+      <Route path="/admin/diagnosis">
+        {() => <AdminGuard component={AdminDiagnosis} />}
       </Route>
 
       {/* Partner */}

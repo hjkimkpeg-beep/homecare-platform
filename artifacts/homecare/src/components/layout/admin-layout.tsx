@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut, Search, Megaphone, FolderOpen, MessageSquareText, FolderKanban, FileText, Bell } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut, Search, Megaphone, FolderOpen, MessageSquareText, FolderKanban, FileText, Bell, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -20,6 +20,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { href: "/admin/resources", label: "자료실", icon: FolderOpen },
     { href: "/admin/board", label: "고객 게시판", icon: MessageSquareText },
     { href: "/admin/sms", label: "문자 알림", icon: Bell },
+    { href: "/admin/diagnosis", label: "원격 점검", icon: Stethoscope },
   ];
 
   return (

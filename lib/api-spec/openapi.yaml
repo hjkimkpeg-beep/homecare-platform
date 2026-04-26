@@ -1392,6 +1392,74 @@ paths:
               schema:
                 $ref: '#/components/schemas/SmsNotification'
 
+  /diagnosis:
+    post:
+      tags: [diagnosis]
+      operationId: createDiagnosisRequest
+      summary: Submit a remote diagnosis request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDiagnosisBody'
+      responses:
+        '201':
+          description: Diagnosis request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosisRequest'
+
+  /admin/diagnosis:
+    get:
+      tags: [diagnosis]
+      operationId: listDiagnosisRequests
+      summary: List all remote diagnosis requests (admin)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: problemType
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Diagnosis request list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiagnosisRequest'
+
+  /admin/diagnosis/{id}/status:
+    patch:
+      tags: [diagnosis]
+      operationId: updateDiagnosisStatus
+      summary: Update diagnosis request status (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDiagnosisStatusBody'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosisRequest'
+
 components:
   schemas:
     HealthStatus:
@@ -2720,3 +2788,100 @@ components:
         - messageContent
         - isSent
         - createdAt
+
+    DiagnosisRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        customerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        preferredDate:
+          type: string
+          nullable: true
+        isUrgent:
+          type: string
+        problemType:
+          type: string
+          enum: [leak, drain, boiler, aircon, electrical, other]
+        description:
+          type: string
+          nullable: true
+        checklistAnswers:
+          type: object
+          nullable: true
+        uploadedFiles:
+          type: array
+          items:
+            type: object
+          nullable: true
+        diagnosisResult:
+          type: object
+          nullable: true
+        estimatedCost:
+          type: string
+          nullable: true
+        urgency:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [received, reviewing, visit_scheduled, completed, cancelled]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - customerName
+        - phone
+        - address
+        - isUrgent
+        - problemType
+        - status
+        - createdAt
+        - updatedAt
+
+    CreateDiagnosisBody:
+      type: object
+      properties:
+        customerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        preferredDate:
+          type: string
+        isUrgent:
+          type: string
+        problemType:
+          type: string
+          enum: [leak, drain, boiler, aircon, electrical, other]
+        description:
+          type: string
+        checklistAnswers:
+          type: object
+        uploadedFiles:
+          type: array
+          items:
+            type: object
+      required:
+        - customerName
+        - phone
+        - address
+        - isUrgent
+        - problemType
+
+    UpdateDiagnosisStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [received, reviewing, visit_scheduled, completed, cancelled]
+      required:
+        - status
