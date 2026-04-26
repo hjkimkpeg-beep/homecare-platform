@@ -1210,3 +1210,282 @@ export const MarkNotificationSentResponse = zod.object({
   sentAt: zod.coerce.date().nullish(),
   createdAt: zod.coerce.date(),
 });
+
+/**
+ * @summary List service projects
+ */
+export const ListProjectsQueryParams = zod.object({
+  status: zod.coerce.string().optional(),
+  partnerId: zod.coerce.string().optional(),
+});
+
+export const ListProjectsResponseItem = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  orderId: zod.string().nullish(),
+  packageId: zod.string().nullish(),
+  applicantName: zod.string(),
+  applicantPhone: zod.string(),
+  applicantAddress: zod.string().nullish(),
+  serviceContent: zod.string().nullish(),
+  partnerId: zod.string().nullish(),
+  partnerName: zod.string().nullish(),
+  notes: zod.string().nullish(),
+  status: zod.string(),
+  startDate: zod.string().nullish(),
+  endDate: zod.string().nullish(),
+  createdBy: zod.string().nullish(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListProjectsResponse = zod.array(ListProjectsResponseItem);
+
+/**
+ * @summary Create a service project
+ */
+export const CreateProjectBody = zod.object({
+  title: zod.string(),
+  orderId: zod.string().optional(),
+  packageId: zod.string().optional(),
+  applicantName: zod.string(),
+  applicantPhone: zod.string(),
+  applicantAddress: zod.string().optional(),
+  serviceContent: zod.string().optional(),
+  partnerId: zod.string().optional(),
+  notes: zod.string().optional(),
+  status: zod.string().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
+});
+
+/**
+ * @summary Get a service project
+ */
+export const GetProjectParams = zod.object({
+  projectId: zod.coerce.string(),
+});
+
+export const GetProjectResponse = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  orderId: zod.string().nullish(),
+  packageId: zod.string().nullish(),
+  applicantName: zod.string(),
+  applicantPhone: zod.string(),
+  applicantAddress: zod.string().nullish(),
+  serviceContent: zod.string().nullish(),
+  partnerId: zod.string().nullish(),
+  partnerName: zod.string().nullish(),
+  notes: zod.string().nullish(),
+  status: zod.string(),
+  startDate: zod.string().nullish(),
+  endDate: zod.string().nullish(),
+  createdBy: zod.string().nullish(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Update a service project
+ */
+export const UpdateProjectParams = zod.object({
+  projectId: zod.coerce.string(),
+});
+
+export const UpdateProjectBody = zod.object({
+  title: zod.string().optional(),
+  orderId: zod.string().optional(),
+  packageId: zod.string().optional(),
+  applicantName: zod.string().optional(),
+  applicantPhone: zod.string().optional(),
+  applicantAddress: zod.string().optional(),
+  serviceContent: zod.string().optional(),
+  partnerId: zod.string().optional(),
+  notes: zod.string().optional(),
+  status: zod.string().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
+});
+
+export const UpdateProjectResponse = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  orderId: zod.string().nullish(),
+  packageId: zod.string().nullish(),
+  applicantName: zod.string(),
+  applicantPhone: zod.string(),
+  applicantAddress: zod.string().nullish(),
+  serviceContent: zod.string().nullish(),
+  partnerId: zod.string().nullish(),
+  partnerName: zod.string().nullish(),
+  notes: zod.string().nullish(),
+  status: zod.string(),
+  startDate: zod.string().nullish(),
+  endDate: zod.string().nullish(),
+  createdBy: zod.string().nullish(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Delete a service project
+ */
+export const DeleteProjectParams = zod.object({
+  projectId: zod.coerce.string(),
+});
+
+/**
+ * @summary List contract templates
+ */
+export const ListContractTemplatesResponseItem = zod.object({
+  id: zod.string(),
+  packageId: zod.string().nullish(),
+  packageName: zod.string().nullish(),
+  title: zod.string(),
+  content: zod.string(),
+  version: zod.string(),
+  isActive: zod.boolean(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListContractTemplatesResponse = zod.array(
+  ListContractTemplatesResponseItem,
+);
+
+/**
+ * @summary Create a contract template
+ */
+export const CreateContractTemplateBody = zod.object({
+  packageId: zod.string().optional(),
+  title: zod.string(),
+  content: zod.string(),
+  version: zod.string().optional(),
+  isActive: zod.boolean().optional(),
+});
+
+/**
+ * @summary Update a contract template
+ */
+export const UpdateContractTemplateParams = zod.object({
+  templateId: zod.coerce.string(),
+});
+
+export const UpdateContractTemplateBody = zod.object({
+  packageId: zod.string().optional(),
+  title: zod.string().optional(),
+  content: zod.string().optional(),
+  version: zod.string().optional(),
+  isActive: zod.boolean().optional(),
+});
+
+export const UpdateContractTemplateResponse = zod.object({
+  id: zod.string(),
+  packageId: zod.string().nullish(),
+  packageName: zod.string().nullish(),
+  title: zod.string(),
+  content: zod.string(),
+  version: zod.string(),
+  isActive: zod.boolean(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Delete a contract template
+ */
+export const DeleteContractTemplateParams = zod.object({
+  templateId: zod.coerce.string(),
+});
+
+/**
+ * @summary List active contract templates for partner agreement
+ */
+export const ListActiveContractsResponseItem = zod.object({
+  id: zod.string(),
+  packageId: zod.string().nullish(),
+  packageName: zod.string().nullish(),
+  title: zod.string(),
+  content: zod.string(),
+  version: zod.string(),
+  isActive: zod.boolean(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListActiveContractsResponse = zod.array(
+  ListActiveContractsResponseItem,
+);
+
+/**
+ * @summary Get partner contract agreements
+ */
+export const GetPartnerContractsResponseItem = zod.object({
+  id: zod.string(),
+  partnerId: zod.string(),
+  templateId: zod.string(),
+  templateTitle: zod.string().nullish(),
+  status: zod.string(),
+  agreedAt: zod.string().nullish(),
+  createdAt: zod.string(),
+});
+export const GetPartnerContractsResponse = zod.array(
+  GetPartnerContractsResponseItem,
+);
+
+/**
+ * @summary Partner agrees to a contract
+ */
+export const AgreeToContractBody = zod.object({
+  templateId: zod.string(),
+});
+
+export const AgreeToContractResponse = zod.object({
+  id: zod.string(),
+  partnerId: zod.string(),
+  templateId: zod.string(),
+  templateTitle: zod.string().nullish(),
+  status: zod.string(),
+  agreedAt: zod.string().nullish(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary List SMS notifications
+ */
+export const ListSmsNotificationsQueryParams = zod.object({
+  isSent: zod.coerce.boolean().optional(),
+  type: zod.coerce.string().optional(),
+});
+
+export const ListSmsNotificationsResponseItem = zod.object({
+  id: zod.string(),
+  type: zod.string(),
+  recipientPhone: zod.string(),
+  recipientName: zod.string().nullish(),
+  messageContent: zod.string(),
+  isSent: zod.boolean(),
+  sentAt: zod.string().nullish(),
+  metadata: zod.object({}).passthrough().nullish(),
+  createdAt: zod.string(),
+});
+export const ListSmsNotificationsResponse = zod.array(
+  ListSmsNotificationsResponseItem,
+);
+
+/**
+ * @summary Mark SMS notification as sent
+ */
+export const MarkSmsSentParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const MarkSmsSentResponse = zod.object({
+  id: zod.string(),
+  type: zod.string(),
+  recipientPhone: zod.string(),
+  recipientName: zod.string().nullish(),
+  messageContent: zod.string(),
+  isSent: zod.boolean(),
+  sentAt: zod.string().nullish(),
+  metadata: zod.object({}).passthrough().nullish(),
+  createdAt: zod.string(),
+});

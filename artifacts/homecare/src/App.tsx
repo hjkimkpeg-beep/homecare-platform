@@ -38,6 +38,11 @@ import AdminManuals from "@/pages/admin/manuals";
 import AdminVideos from "@/pages/admin/videos";
 import AdminBoard from "@/pages/admin/board";
 import CustomerBoard from "@/pages/customer/board";
+import AdminResources from "@/pages/admin/resources";
+import AdminProjects from "@/pages/admin/projects";
+import AdminContracts from "@/pages/admin/contracts";
+import AdminSms from "@/pages/admin/sms";
+import CustomerResources from "@/pages/customer/resources";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -105,6 +110,9 @@ function Router() {
       <Route path="/board">
         {() => <CustomerGuard component={CustomerBoard} />}
       </Route>
+      <Route path="/resources">
+        {() => <CustomerGuard component={CustomerResources} />}
+      </Route>
 
       {/* Admin */}
       <Route path="/admin">
@@ -136,6 +144,18 @@ function Router() {
       </Route>
       <Route path="/admin/board">
         {() => <AdminGuard component={AdminBoard} />}
+      </Route>
+      <Route path="/admin/resources">
+        {() => <AdminGuard component={AdminResources} />}
+      </Route>
+      <Route path="/admin/projects">
+        {() => <AdminGuard component={AdminProjects} />}
+      </Route>
+      <Route path="/admin/contracts">
+        {() => <AdminGuard component={AdminContracts} />}
+      </Route>
+      <Route path="/admin/sms">
+        {() => <AdminGuard component={AdminSms} />}
       </Route>
 
       {/* Partner */}

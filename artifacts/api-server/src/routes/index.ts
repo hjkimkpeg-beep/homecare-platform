@@ -13,6 +13,9 @@ import videosRouter from "./videos";
 import externalVideosRouter from "./external-videos";
 import standardManualsRouter from "./standard-manuals";
 import boardRouter from "./board";
+import projectsRouter from "./projects";
+import contractsRouter from "./contracts";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
@@ -30,5 +33,8 @@ router.use(videosRouter);
 router.use(externalVideosRouter);
 router.use(standardManualsRouter);
 router.use(boardRouter);
+router.use(projectsRouter);
+router.use(contractsRouter);
+router.use(notificationsRouter);
 
 export default router;

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { Home, ClipboardList, Wrench, KeyRound, MessageSquareText } from "lucide-react";
+import { Home, ClipboardList, Wrench, KeyRound, MessageSquareText, BookOpen } from "lucide-react";
 import { ChatbotWidget } from "@/components/ChatbotWidget";
 
 export function CustomerLayout({ children }: { children: ReactNode }) {
@@ -12,6 +12,7 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
     { href: "/", label: "홈", icon: Home },
     { href: "/orders", label: "주문", icon: ClipboardList },
     { href: "/as-requests", label: "A/S", icon: Wrench },
+    { href: "/resources", label: "자료실", icon: BookOpen },
     { href: "/board", label: "게시판", icon: MessageSquareText },
   ];
 

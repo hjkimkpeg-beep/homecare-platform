@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut, Search, Megaphone, BookOpen, Film, MessageSquareText } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Users, Wrench, LogOut, Search, Megaphone, FolderOpen, MessageSquareText, FolderKanban, FileText, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -11,13 +11,15 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const navItems = [
     { href: "/admin", label: "대시보드", icon: LayoutDashboard },
     { href: "/admin/orders", label: "주문 관리", icon: ClipboardList },
+    { href: "/admin/projects", label: "프로젝트 관리", icon: FolderKanban },
     { href: "/admin/booking-lookup", label: "예약 현황 조회", icon: Search },
     { href: "/admin/partners", label: "파트너 관리", icon: Users },
+    { href: "/admin/contracts", label: "계약서 관리", icon: FileText },
     { href: "/admin/as-requests", label: "A/S 관리", icon: Wrench },
     { href: "/admin/marketing", label: "마케팅 AI", icon: Megaphone },
-    { href: "/admin/manuals", label: "서비스 매뉴얼", icon: BookOpen },
-    { href: "/admin/videos", label: "동영상 관리", icon: Film },
+    { href: "/admin/resources", label: "자료실", icon: FolderOpen },
     { href: "/admin/board", label: "고객 게시판", icon: MessageSquareText },
+    { href: "/admin/sms", label: "문자 알림", icon: Bell },
   ];
 
   return (
@@ -28,7 +30,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <h1 className="font-bold text-xl 2xl:text-2xl text-primary">HomeCare Admin</h1>
           {user && <p className="text-sm 2xl:text-base text-gray-500 mt-1">{user.name}님 환영합니다</p>}
         </div>
-        <nav className="flex-1 p-4 2xl:p-5 space-y-1 2xl:space-y-1.5">
+        <nav className="flex-1 p-4 2xl:p-5 space-y-1 2xl:space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = location === item.href || (item.href !== "/admin" && location.startsWith(item.href));
             return (
@@ -39,7 +41,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                       ? "bg-primary/10 text-primary font-medium"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
-                  data-testid={`admin-nav-${item.href.replace("/admin", "").replace("/", "") || "dashboard"}`}
+                  data-testid={`admin-nav-${item.href.replace("/admin/", "").replace("/admin", "dashboard")}`}
                 >
                   <item.icon className="w-5 h-5 2xl:w-6 2xl:h-6 shrink-0" />
                   <span>{item.label}</span>

@@ -1136,6 +1136,261 @@ paths:
               schema:
                 $ref: '#/components/schemas/BoardNotification'
 
+  /admin/projects:
+    get:
+      tags: [projects]
+      operationId: listProjects
+      summary: List service projects
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: partnerId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceProject'
+    post:
+      tags: [projects]
+      operationId: createProject
+      summary: Create a service project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectBody'
+      responses:
+        '201':
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceProject'
+
+  /admin/projects/{projectId}:
+    get:
+      tags: [projects]
+      operationId: getProject
+      summary: Get a service project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceProject'
+    patch:
+      tags: [projects]
+      operationId: updateProject
+      summary: Update a service project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectBody'
+      responses:
+        '200':
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceProject'
+    delete:
+      tags: [projects]
+      operationId: deleteProject
+      summary: Delete a service project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+
+  /admin/contracts:
+    get:
+      tags: [contracts]
+      operationId: listContractTemplates
+      summary: List contract templates
+      responses:
+        '200':
+          description: Contract template list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractTemplate'
+    post:
+      tags: [contracts]
+      operationId: createContractTemplate
+      summary: Create a contract template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContractTemplateBody'
+      responses:
+        '201':
+          description: Created template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractTemplate'
+
+  /admin/contracts/{templateId}:
+    patch:
+      tags: [contracts]
+      operationId: updateContractTemplate
+      summary: Update a contract template
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContractTemplateBody'
+      responses:
+        '200':
+          description: Updated template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractTemplate'
+    delete:
+      tags: [contracts]
+      operationId: deleteContractTemplate
+      summary: Delete a contract template
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+
+  /contracts/active:
+    get:
+      tags: [contracts]
+      operationId: listActiveContracts
+      summary: List active contract templates for partner agreement
+      responses:
+        '200':
+          description: Active contracts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractTemplate'
+
+  /partner/contracts:
+    get:
+      tags: [contracts]
+      operationId: getPartnerContracts
+      summary: Get partner contract agreements
+      responses:
+        '200':
+          description: Partner agreements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PartnerContractAgreement'
+    post:
+      tags: [contracts]
+      operationId: agreeToContract
+      summary: Partner agrees to a contract
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgreeToContractBody'
+      responses:
+        '200':
+          description: Agreement recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerContractAgreement'
+
+  /admin/notifications:
+    get:
+      tags: [notifications]
+      operationId: listSmsNotifications
+      summary: List SMS notifications
+      parameters:
+        - name: isSent
+          in: query
+          schema:
+            type: boolean
+        - name: type
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SmsNotification'
+
+  /admin/notifications/{id}/send:
+    patch:
+      tags: [notifications]
+      operationId: markSmsSent
+      summary: Mark SMS notification as sent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Marked as sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsNotification'
 
 components:
   schemas:
@@ -2220,3 +2475,248 @@ components:
           type: string
       required:
         - content
+
+    ServiceProject:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        orderId:
+          type: string
+          nullable: true
+        packageId:
+          type: string
+          nullable: true
+        applicantName:
+          type: string
+        applicantPhone:
+          type: string
+        applicantAddress:
+          type: string
+          nullable: true
+        serviceContent:
+          type: string
+          nullable: true
+        partnerId:
+          type: string
+          nullable: true
+        partnerName:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        status:
+          type: string
+        startDate:
+          type: string
+          nullable: true
+        endDate:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - title
+        - applicantName
+        - applicantPhone
+        - status
+        - createdAt
+        - updatedAt
+
+    CreateProjectBody:
+      type: object
+      properties:
+        title:
+          type: string
+        orderId:
+          type: string
+        packageId:
+          type: string
+        applicantName:
+          type: string
+        applicantPhone:
+          type: string
+        applicantAddress:
+          type: string
+        serviceContent:
+          type: string
+        partnerId:
+          type: string
+        notes:
+          type: string
+        status:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+      required:
+        - title
+        - applicantName
+        - applicantPhone
+
+    UpdateProjectBody:
+      type: object
+      properties:
+        title:
+          type: string
+        orderId:
+          type: string
+        packageId:
+          type: string
+        applicantName:
+          type: string
+        applicantPhone:
+          type: string
+        applicantAddress:
+          type: string
+        serviceContent:
+          type: string
+        partnerId:
+          type: string
+        notes:
+          type: string
+        status:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+
+    ContractTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        packageId:
+          type: string
+          nullable: true
+        packageName:
+          type: string
+          nullable: true
+        title:
+          type: string
+        content:
+          type: string
+        version:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - title
+        - content
+        - version
+        - isActive
+        - createdAt
+        - updatedAt
+
+    CreateContractTemplateBody:
+      type: object
+      properties:
+        packageId:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        version:
+          type: string
+        isActive:
+          type: boolean
+      required:
+        - title
+        - content
+
+    UpdateContractTemplateBody:
+      type: object
+      properties:
+        packageId:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        version:
+          type: string
+        isActive:
+          type: boolean
+
+    PartnerContractAgreement:
+      type: object
+      properties:
+        id:
+          type: string
+        partnerId:
+          type: string
+        templateId:
+          type: string
+        templateTitle:
+          type: string
+          nullable: true
+        status:
+          type: string
+        agreedAt:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - partnerId
+        - templateId
+        - status
+        - createdAt
+
+    AgreeToContractBody:
+      type: object
+      properties:
+        templateId:
+          type: string
+      required:
+        - templateId
+
+    SmsNotification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        recipientPhone:
+          type: string
+        recipientName:
+          type: string
+          nullable: true
+        messageContent:
+          type: string
+        isSent:
+          type: boolean
+        sentAt:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - type
+        - recipientPhone
+        - messageContent
+        - isSent
+        - createdAt

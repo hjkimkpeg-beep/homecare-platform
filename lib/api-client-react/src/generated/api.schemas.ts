@@ -521,6 +521,112 @@ export interface CreateBoardCommentBody {
   content: string;
 }
 
+export interface ServiceProject {
+  id: string;
+  title: string;
+  orderId?: string | null;
+  packageId?: string | null;
+  applicantName: string;
+  applicantPhone: string;
+  applicantAddress?: string | null;
+  serviceContent?: string | null;
+  partnerId?: string | null;
+  partnerName?: string | null;
+  notes?: string | null;
+  status: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  createdBy?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateProjectBody {
+  title: string;
+  orderId?: string;
+  packageId?: string;
+  applicantName: string;
+  applicantPhone: string;
+  applicantAddress?: string;
+  serviceContent?: string;
+  partnerId?: string;
+  notes?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface UpdateProjectBody {
+  title?: string;
+  orderId?: string;
+  packageId?: string;
+  applicantName?: string;
+  applicantPhone?: string;
+  applicantAddress?: string;
+  serviceContent?: string;
+  partnerId?: string;
+  notes?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface ContractTemplate {
+  id: string;
+  packageId?: string | null;
+  packageName?: string | null;
+  title: string;
+  content: string;
+  version: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateContractTemplateBody {
+  packageId?: string;
+  title: string;
+  content: string;
+  version?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateContractTemplateBody {
+  packageId?: string;
+  title?: string;
+  content?: string;
+  version?: string;
+  isActive?: boolean;
+}
+
+export interface PartnerContractAgreement {
+  id: string;
+  partnerId: string;
+  templateId: string;
+  templateTitle?: string | null;
+  status: string;
+  agreedAt?: string | null;
+  createdAt: string;
+}
+
+export interface AgreeToContractBody {
+  templateId: string;
+}
+
+export type SmsNotificationMetadata = { [key: string]: unknown } | null;
+
+export interface SmsNotification {
+  id: string;
+  type: string;
+  recipientPhone: string;
+  recipientName?: string | null;
+  messageContent: string;
+  isSent: boolean;
+  sentAt?: string | null;
+  metadata?: SmsNotificationMetadata;
+  createdAt: string;
+}
+
 export type ListOrdersParams = {
   status?: string;
 };
@@ -569,4 +675,14 @@ export type UpdateBoardPostStatusBody = {
 
 export type ListBoardNotificationsParams = {
   sent?: string;
+};
+
+export type ListProjectsParams = {
+  status?: string;
+  partnerId?: string;
+};
+
+export type ListSmsNotificationsParams = {
+  isSent?: boolean;
+  type?: string;
 };
