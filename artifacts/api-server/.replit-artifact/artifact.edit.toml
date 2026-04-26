@@ -12,10 +12,6 @@ paths = ["/api", "/", "/__mockup"]
 [services.development]
 run = "pnpm --filter @workspace/api-server run dev"
 
-[services.development.env]
-HOMECARE_PORT = "24243"
-MOCKUP_PORT = "8081"
-
 [services.production]
 
 [services.production.build]
