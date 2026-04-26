@@ -3,8 +3,6 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import path from "path";
-import { createProxyMiddleware } from "http-proxy-middleware";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -50,37 +48,5 @@ app.use(
 );
 
 app.use("/api", router);
-
-if (process.env.NODE_ENV === "production") {
-  // Production: serve the built frontend static files directly
-  const staticDir = path.join(process.cwd(), "artifacts/homecare/dist/public");
-  app.use(express.static(staticDir));
-  // SPA fallback: serve index.html for any route not handled above
-  app.get("*", (_req, res) => {
-    res.sendFile(path.join(staticDir, "index.html"));
-  });
-} else {
-  // Development: proxy to the Vite dev server (homecare) and mockup-sandbox
-  const homecarePort = process.env.HOMECARE_PORT || "24243";
-  const mockupPort = process.env.MOCKUP_PORT || "8081";
-
-  app.use(
-    "/__mockup",
-    createProxyMiddleware({
-      target: `http://localhost:${mockupPort}`,
-      changeOrigin: true,
-      ws: true,
-    }),
-  );
-
-  app.use(
-    "/",
-    createProxyMiddleware({
-      target: `http://localhost:${homecarePort}`,
-      changeOrigin: true,
-      ws: true,
-    }),
-  );
-}
 
 export default app;

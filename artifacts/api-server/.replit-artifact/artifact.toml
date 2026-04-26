@@ -7,24 +7,18 @@ id = "3B4_FFSkEVBkAeYMFRJ2e"
 [[services]]
 localPort = 8080
 name = "API Server"
-paths = ["/api", "/", "/__mockup"]
+paths = ["/api"]
 
 [services.development]
 run = "pnpm --filter @workspace/api-server run dev"
 
-[services.development.env]
-HOMECARE_PORT = "24243"
-MOCKUP_PORT = "8081"
-
 [services.production]
 
 [services.production.build]
-args = ["sh", "-c", "pnpm --filter @workspace/homecare run build && pnpm --filter @workspace/api-server run build"]
+args = ["pnpm", "--filter", "@workspace/api-server", "run", "build"]
 
 [services.production.build.env]
 NODE_ENV = "production"
-PORT = "24243"
-BASE_PATH = "/"
 
 [services.production.run]
 args = ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]

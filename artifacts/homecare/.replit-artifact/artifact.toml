@@ -12,10 +12,18 @@ version = "1.0.0"
 [[services]]
 name = "web"
 paths = [ "/" ]
-localPort = 8080
+localPort = 24243
 
 [services.development]
 run = "pnpm --filter @workspace/homecare run dev"
+
+[services.production]
+serve = "static"
+publicDir = "artifacts/homecare/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
 
 [services.env]
 PORT = "24243"
