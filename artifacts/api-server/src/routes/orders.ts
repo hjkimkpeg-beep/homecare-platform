@@ -12,6 +12,7 @@ import {
   customerProfilesTable,
 } from "@workspace/db";
 import { requireAuth } from "../middlewares/auth";
+import { isOrderStatus, type OrderStatus } from "../lib/order-status";
 import "../lib/session";
 
 const router: IRouter = Router();
@@ -31,6 +32,10 @@ router.get("/orders", requireAuth, async (req, res): Promise<void> => {
   }
 
   const { status } = req.query;
+  if (status !== undefined && !isOrderStatus(status)) {
+    res.status(400).json({ error: "유효하지 않은 주문 상태입니다" });
+    return;
+  }
 
   let query = db
     .select()
@@ -217,7 +222,7 @@ router.patch("/orders/:id/modify", async (req, res): Promise<void> => {
     return;
   }
 
-  const modifiableStatuses = ["pending_assignment", "assigned"];
+  const modifiableStatuses: OrderStatus[] = ["pending_assignment", "assigned"];
   if (!modifiableStatuses.includes(order.status)) {
     res.status(400).json({ error: "현재 상태에서는 예약을 수정할 수 없습니다" });
     return;
@@ -364,7 +369,7 @@ router.post("/orders/:id/cancel", requireAuth, async (req, res): Promise<void> =
     return;
   }
 
-  const cancelableStatuses = ["pending_assignment", "paid", "requested"];
+  const cancelableStatuses: OrderStatus[] = ["pending_assignment", "paid", "requested"];
   if (!cancelableStatuses.includes(order.status)) {
     res.status(400).json({ error: "현재 상태에서는 취소할 수 없습니다" });
     return;

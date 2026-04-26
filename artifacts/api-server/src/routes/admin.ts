@@ -11,9 +11,21 @@ import {
   asRequestsTable,
 } from "@workspace/db";
 import { requireAdmin } from "../middlewares/auth";
+import { isOrderStatus } from "../lib/order-status";
 import "../lib/session";
 
 const router: IRouter = Router();
+
+const PARTNER_APPROVAL_STATUSES = ["pending", "approved", "rejected", "suspended"] as const;
+
+function isPartnerApprovalStatus(
+  value: unknown,
+): value is (typeof PARTNER_APPROVAL_STATUSES)[number] {
+  return (
+    typeof value === "string" &&
+    PARTNER_APPROVAL_STATUSES.includes(value as (typeof PARTNER_APPROVAL_STATUSES)[number])
+  );
+}
 
 router.get("/admin/dashboard", requireAdmin, async (_req, res): Promise<void> => {
   const today = new Date();
@@ -211,6 +223,10 @@ router.patch("/admin/orders/:id/status", requireAdmin, async (req, res): Promise
     res.status(400).json({ error: "상태를 입력해주세요" });
     return;
   }
+  if (!isOrderStatus(status)) {
+    res.status(400).json({ error: "유효하지 않은 주문 상태입니다" });
+    return;
+  }
 
   const [order] = await db
     .select()
@@ -389,6 +405,10 @@ router.post("/admin/partners/:id/approve", requireAdmin, async (req, res): Promi
 
   if (!approvalStatus) {
     res.status(400).json({ error: "승인 상태를 입력해주세요" });
+    return;
+  }
+  if (!isPartnerApprovalStatus(approvalStatus)) {
+    res.status(400).json({ error: "유효하지 않은 파트너 승인 상태입니다" });
     return;
   }
 

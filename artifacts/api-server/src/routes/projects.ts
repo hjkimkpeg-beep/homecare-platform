@@ -12,6 +12,11 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+function getParam(req: any, key: string): string {
+  const value = req.params?.[key];
+  return Array.isArray(value) ? value[0] : String(value);
+}
+
 router.get("/admin/projects", requireAdmin, async (req, res): Promise<void> => {
   const { status, partnerId } = req.query as Record<string, string>;
 
@@ -81,7 +86,7 @@ router.post("/admin/projects", requireAdmin, async (req, res): Promise<void> => 
 });
 
 router.get("/admin/projects/:projectId", requireAdmin, async (req, res): Promise<void> => {
-  const { projectId } = req.params;
+  const projectId = getParam(req, "projectId");
 
   const [project] = await db
     .select({
@@ -117,7 +122,7 @@ router.get("/admin/projects/:projectId", requireAdmin, async (req, res): Promise
 });
 
 router.patch("/admin/projects/:projectId", requireAdmin, async (req, res): Promise<void> => {
-  const { projectId } = req.params;
+  const projectId = getParam(req, "projectId");
   const { title, orderId, packageId, applicantName, applicantPhone, applicantAddress,
     serviceContent, partnerId, notes, status, startDate, endDate } = req.body;
 
@@ -155,7 +160,7 @@ router.patch("/admin/projects/:projectId", requireAdmin, async (req, res): Promi
 });
 
 router.delete("/admin/projects/:projectId", requireAdmin, async (req, res): Promise<void> => {
-  const { projectId } = req.params;
+  const projectId = getParam(req, "projectId");
 
   await db.delete(serviceProjectsTable).where(eq(serviceProjectsTable.id, projectId));
   res.json({ ok: true });

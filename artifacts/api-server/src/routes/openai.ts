@@ -7,6 +7,11 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+function getParam(req: any, key: string): string {
+  const value = req.params?.[key];
+  return Array.isArray(value) ? value[0] : String(value);
+}
+
 const CHATBOT_SYSTEM_PROMPT = `당신은 '홈케어 플랫폼'의 고객 상담 AI 어시스턴트입니다. 친절하고 전문적인 한국어로 답변합니다.
 
 ## 서비스 패키지 정보
@@ -68,7 +73,7 @@ router.get("/openai/conversations", requireAuth, async (req, res): Promise<void>
   res.json(list);
 });
 
-router.post("/openai/conversations", async (req, res): Promise<void> => {
+router.post("/openai/conversations", requireAuth, async (req, res): Promise<void> => {
   const { title } = req.body as { title: string };
   if (!title) {
     res.status(400).json({ error: "title이 필요합니다" });
@@ -78,8 +83,8 @@ router.post("/openai/conversations", async (req, res): Promise<void> => {
   res.status(201).json(conv);
 });
 
-router.get("/openai/conversations/:id", async (req, res): Promise<void> => {
-  const id = parseInt(req.params.id, 10);
+router.get("/openai/conversations/:id", requireAuth, async (req, res): Promise<void> => {
+  const id = parseInt(getParam(req, "id"), 10);
   if (isNaN(id)) {
     res.status(400).json({ error: "잘못된 id입니다" });
     return;
@@ -97,8 +102,8 @@ router.get("/openai/conversations/:id", async (req, res): Promise<void> => {
   res.json({ ...conv, messages: msgs });
 });
 
-router.post("/openai/conversations/:id/messages", async (req, res): Promise<void> => {
-  const id = parseInt(req.params.id, 10);
+router.post("/openai/conversations/:id/messages", requireAuth, async (req, res): Promise<void> => {
+  const id = parseInt(getParam(req, "id"), 10);
   if (isNaN(id)) {
     res.status(400).json({ error: "잘못된 id입니다" });
     return;

@@ -3,10 +3,25 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+import crypto from "crypto";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
+
+function resolveSessionSecret(): string {
+  if (process.env.SESSION_SECRET) {
+    return process.env.SESSION_SECRET;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET must be set in production");
+  }
+
+  const generated = crypto.randomBytes(32).toString("hex");
+  logger.warn("SESSION_SECRET is not set. Using an ephemeral development secret.");
+  return generated;
+}
 
 app.set("trust proxy", 1);
 
@@ -35,7 +50,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "homecare-dev-secret-2024",
+    secret: resolveSessionSecret(),
     resave: false,
     saveUninitialized: false,
     cookie: {

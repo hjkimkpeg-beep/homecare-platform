@@ -13,6 +13,17 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+const BOARD_CATEGORIES = ["inquiry", "notice", "general", "complaint"] as const;
+const BOARD_STATUSES = ["open", "answered", "closed"] as const;
+
+function isBoardCategory(value: unknown): value is (typeof BOARD_CATEGORIES)[number] {
+  return typeof value === "string" && BOARD_CATEGORIES.includes(value as (typeof BOARD_CATEGORIES)[number]);
+}
+
+function isBoardStatus(value: unknown): value is (typeof BOARD_STATUSES)[number] {
+  return typeof value === "string" && BOARD_STATUSES.includes(value as (typeof BOARD_STATUSES)[number]);
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
   inquiry: "문의",
   notice: "공지",
@@ -45,6 +56,12 @@ async function getSessionUser(req: any) {
   return { id: userId, role: userRole ?? "customer" };
 }
 
+function parseIntParam(req: any, key: string): number | null {
+  const value = req.params?.[key];
+  const parsed = Number.parseInt(String(value), 10);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
 // ─── Public / Auth ──────────────────────────────────────────────────────────
 
 router.get("/board", async (req, res): Promise<void> => {
@@ -55,10 +72,20 @@ router.get("/board", async (req, res): Promise<void> => {
     limit = "20",
   } = req.query as Record<string, string>;
   const offset = (parseInt(page) - 1) * parseInt(limit);
+  if (category && !isBoardCategory(category)) {
+    res.status(400).json({ error: "유효하지 않은 category입니다" });
+    return;
+  }
+  if (status && !isBoardStatus(status)) {
+    res.status(400).json({ error: "유효하지 않은 status입니다" });
+    return;
+  }
+  const categoryFilter = category && isBoardCategory(category) ? category : undefined;
+  const statusFilter = status && isBoardStatus(status) ? status : undefined;
 
   const conditions = [isNull(boardPostsTable.deletedAt)];
-  if (category) conditions.push(eq(boardPostsTable.category, category as any));
-  if (status) conditions.push(eq(boardPostsTable.status, status as any));
+  if (categoryFilter) conditions.push(eq(boardPostsTable.category, categoryFilter));
+  if (statusFilter) conditions.push(eq(boardPostsTable.status, statusFilter));
 
   const posts = await db
     .select({
@@ -92,7 +119,11 @@ router.get("/board", async (req, res): Promise<void> => {
 });
 
 router.get("/board/:postId", requireAuth, async (req, res): Promise<void> => {
-  const postId = parseInt(req.params.postId);
+  const postId = parseIntParam(req, "postId");
+  if (postId === null) {
+    res.status(400).json({ error: "유효하지 않은 postId입니다" });
+    return;
+  }
   const sessionUser = await getSessionUser(req);
   if (!sessionUser) { res.status(401).json({ error: "Unauthorized" }); return; }
 
@@ -147,6 +178,10 @@ router.post("/board", requireAuth, async (req, res): Promise<void> => {
     res.status(400).json({ error: "제목과 내용을 입력해주세요" });
     return;
   }
+  if (category !== undefined && !isBoardCategory(category)) {
+    res.status(400).json({ error: "유효하지 않은 category입니다" });
+    return;
+  }
 
   const [dbUser] = await db
     .select()
@@ -173,7 +208,7 @@ router.post("/board", requireAuth, async (req, res): Promise<void> => {
       authorType,
       title: title.trim(),
       content: content.trim(),
-      category: (category as any) ?? "general",
+      category: category ?? "general",
       isSecret: isSecret ?? false,
       contactPhone: dbUser.phone ?? null,
     })
@@ -183,7 +218,11 @@ router.post("/board", requireAuth, async (req, res): Promise<void> => {
 });
 
 router.patch("/board/:postId", requireAuth, async (req, res): Promise<void> => {
-  const postId = parseInt(req.params.postId);
+  const postId = parseIntParam(req, "postId");
+  if (postId === null) {
+    res.status(400).json({ error: "유효하지 않은 postId입니다" });
+    return;
+  }
   const sessionUser = await getSessionUser(req);
   if (!sessionUser) { res.status(401).json({ error: "Unauthorized" }); return; }
   const isAdmin = sessionUser.role === "admin" || sessionUser.role === "operator";
@@ -204,6 +243,10 @@ router.patch("/board/:postId", requireAuth, async (req, res): Promise<void> => {
   }
 
   const { title, content, category, isSecret } = req.body as any;
+  if (category !== undefined && !isBoardCategory(category)) {
+    res.status(400).json({ error: "유효하지 않은 category입니다" });
+    return;
+  }
   const [updated] = await db
     .update(boardPostsTable)
     .set({
@@ -219,7 +262,11 @@ router.patch("/board/:postId", requireAuth, async (req, res): Promise<void> => {
 });
 
 router.delete("/board/:postId", requireAuth, async (req, res): Promise<void> => {
-  const postId = parseInt(req.params.postId);
+  const postId = parseIntParam(req, "postId");
+  if (postId === null) {
+    res.status(400).json({ error: "유효하지 않은 postId입니다" });
+    return;
+  }
   const sessionUser = await getSessionUser(req);
   if (!sessionUser) { res.status(401).json({ error: "Unauthorized" }); return; }
   const isAdmin = sessionUser.role === "admin" || sessionUser.role === "operator";
@@ -253,7 +300,11 @@ router.post(
   "/board/:postId/comments",
   requireAuth,
   async (req, res): Promise<void> => {
-    const postId = parseInt(req.params.postId);
+    const postId = parseIntParam(req, "postId");
+    if (postId === null) {
+      res.status(400).json({ error: "유효하지 않은 postId입니다" });
+      return;
+    }
     const sessionUser = await getSessionUser(req);
     if (!sessionUser) { res.status(401).json({ error: "Unauthorized" }); return; }
     const isAdmin = sessionUser.role === "admin" || sessionUser.role === "operator";
@@ -332,8 +383,12 @@ router.patch(
   "/board/:postId/comments/:commentId",
   requireAuth,
   async (req, res): Promise<void> => {
-    const postId = parseInt(req.params.postId);
-    const commentId = parseInt(req.params.commentId);
+    const postId = parseIntParam(req, "postId");
+    const commentId = parseIntParam(req, "commentId");
+    if (postId === null || commentId === null) {
+      res.status(400).json({ error: "유효하지 않은 경로 파라미터입니다" });
+      return;
+    }
     const sessionUser = await getSessionUser(req);
     if (!sessionUser) { res.status(401).json({ error: "Unauthorized" }); return; }
     const isAdmin = sessionUser.role === "admin" || sessionUser.role === "operator";
@@ -374,8 +429,12 @@ router.delete(
   "/board/:postId/comments/:commentId",
   requireAuth,
   async (req, res): Promise<void> => {
-    const postId = parseInt(req.params.postId);
-    const commentId = parseInt(req.params.commentId);
+    const postId = parseIntParam(req, "postId");
+    const commentId = parseIntParam(req, "commentId");
+    if (postId === null || commentId === null) {
+      res.status(400).json({ error: "유효하지 않은 경로 파라미터입니다" });
+      return;
+    }
     const sessionUser = await getSessionUser(req);
     if (!sessionUser) { res.status(401).json({ error: "Unauthorized" }); return; }
     const isAdmin = sessionUser.role === "admin" || sessionUser.role === "operator";
@@ -416,7 +475,11 @@ router.post(
   "/board/:postId/ai-reply",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const postId = parseInt(req.params.postId);
+    const postId = parseIntParam(req, "postId");
+    if (postId === null) {
+      res.status(400).json({ error: "유효하지 않은 postId입니다" });
+      return;
+    }
 
     const [post] = await db
       .select()
@@ -453,7 +516,11 @@ router.patch(
   "/admin/board/:postId/pin",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const postId = parseInt(req.params.postId);
+    const postId = parseIntParam(req, "postId");
+    if (postId === null) {
+      res.status(400).json({ error: "유효하지 않은 postId입니다" });
+      return;
+    }
     const { isPinned } = req.body as { isPinned: boolean };
 
     await db
@@ -469,12 +536,20 @@ router.patch(
   "/admin/board/:postId/status",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const postId = parseInt(req.params.postId);
+    const postId = parseIntParam(req, "postId");
+    if (postId === null) {
+      res.status(400).json({ error: "유효하지 않은 postId입니다" });
+      return;
+    }
     const { status } = req.body as { status: string };
+    if (!isBoardStatus(status)) {
+      res.status(400).json({ error: "유효하지 않은 status입니다" });
+      return;
+    }
 
     const [updated] = await db
       .update(boardPostsTable)
-      .set({ status: status as any })
+      .set({ status })
       .where(eq(boardPostsTable.id, postId))
       .returning();
 
@@ -508,7 +583,11 @@ router.patch(
   "/admin/board/notifications/:id/sent",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const id = parseInt(req.params.id);
+    const id = parseIntParam(req, "id");
+    if (id === null) {
+      res.status(400).json({ error: "유효하지 않은 id입니다" });
+      return;
+    }
     const [updated] = await db
       .update(boardNotificationsTable)
       .set({ isSent: true, sentAt: new Date() })

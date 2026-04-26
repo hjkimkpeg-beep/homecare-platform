@@ -6,6 +6,39 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+const DIAGNOSIS_PROBLEM_TYPES = [
+  "leak",
+  "drain",
+  "boiler",
+  "aircon",
+  "electrical",
+  "other",
+] as const;
+
+const DIAGNOSIS_STATUSES = [
+  "received",
+  "reviewing",
+  "visit_scheduled",
+  "completed",
+  "cancelled",
+] as const;
+
+function isDiagnosisProblemType(
+  value: unknown,
+): value is (typeof DIAGNOSIS_PROBLEM_TYPES)[number] {
+  return (
+    typeof value === "string" &&
+    DIAGNOSIS_PROBLEM_TYPES.includes(value as (typeof DIAGNOSIS_PROBLEM_TYPES)[number])
+  );
+}
+
+function isDiagnosisStatus(value: unknown): value is (typeof DIAGNOSIS_STATUSES)[number] {
+  return (
+    typeof value === "string" &&
+    DIAGNOSIS_STATUSES.includes(value as (typeof DIAGNOSIS_STATUSES)[number])
+  );
+}
+
 // Diagnosis rules for rule-based engine
 const diagnosisRules: Record<string, {
   label: string;
@@ -76,8 +109,12 @@ router.post("/diagnosis", async (req, res): Promise<void> => {
     res.status(400).json({ error: "필수 항목이 누락되었습니다" });
     return;
   }
+  if (!isDiagnosisProblemType(problemType)) {
+    res.status(400).json({ error: "유효하지 않은 problemType입니다" });
+    return;
+  }
 
-  const rules = diagnosisRules[problemType as string] ?? diagnosisRules.other;
+  const rules = diagnosisRules[problemType] ?? diagnosisRules.other;
 
   const diagnosisResult = {
     label: rules.label,
@@ -96,7 +133,7 @@ router.post("/diagnosis", async (req, res): Promise<void> => {
       address,
       preferredDate: preferredDate ?? null,
       isUrgent: isUrgent ?? "no",
-      problemType: problemType as any,
+      problemType,
       description: description ?? null,
       checklistAnswers: checklistAnswers ?? null,
       uploadedFiles: uploadedFiles ?? null,
@@ -113,6 +150,14 @@ router.post("/diagnosis", async (req, res): Promise<void> => {
 // Admin: list all diagnosis requests
 router.get("/admin/diagnosis", requireAdmin, async (req, res): Promise<void> => {
   const { status, problemType } = req.query as Record<string, string>;
+  if (status && !isDiagnosisStatus(status)) {
+    res.status(400).json({ error: "유효하지 않은 status입니다" });
+    return;
+  }
+  if (problemType && !isDiagnosisProblemType(problemType)) {
+    res.status(400).json({ error: "유효하지 않은 problemType입니다" });
+    return;
+  }
 
   const all = await db
     .select()
@@ -130,17 +175,21 @@ router.get("/admin/diagnosis", requireAdmin, async (req, res): Promise<void> => 
 
 // Admin: update status
 router.patch("/admin/diagnosis/:id/status", requireAdmin, async (req, res): Promise<void> => {
-  const { id } = req.params;
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const { status } = req.body;
 
   if (!status) {
     res.status(400).json({ error: "status는 필수입니다" });
     return;
   }
+  if (!isDiagnosisStatus(status)) {
+    res.status(400).json({ error: "유효하지 않은 status입니다" });
+    return;
+  }
 
   const [updated] = await db
     .update(remoteDiagnosisTable)
-    .set({ status: status as any, updatedAt: new Date() })
+    .set({ status, updatedAt: new Date() })
     .where(eq(remoteDiagnosisTable.id, id))
     .returning();
 

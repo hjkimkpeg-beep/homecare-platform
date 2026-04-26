@@ -6,8 +6,13 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+function getParam(req: any, key: string): string {
+  const value = req.params?.[key];
+  return Array.isArray(value) ? value[0] : String(value);
+}
+
 router.get("/packages/:packageId/external-videos", async (req, res): Promise<void> => {
-  const { packageId } = req.params;
+  const packageId = getParam(req, "packageId");
   const videos = await db
     .select()
     .from(packageExternalVideosTable)
@@ -20,7 +25,7 @@ router.post(
   "/packages/:packageId/external-videos",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const { packageId } = req.params;
+    const packageId = getParam(req, "packageId");
 
     const [pkg] = await db
       .select()
@@ -81,7 +86,8 @@ router.put(
   "/packages/:packageId/external-videos/:videoId",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const { packageId, videoId } = req.params;
+    const packageId = getParam(req, "packageId");
+    const videoId = getParam(req, "videoId");
     const id = parseInt(videoId, 10);
 
     const { title, description, sortOrder } = req.body as {
@@ -116,7 +122,8 @@ router.delete(
   "/packages/:packageId/external-videos/:videoId",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const { packageId, videoId } = req.params;
+    const packageId = getParam(req, "packageId");
+    const videoId = getParam(req, "videoId");
     const id = parseInt(videoId, 10);
 
     const [deleted] = await db

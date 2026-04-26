@@ -7,20 +7,8 @@ import {
   partnerProfilesTable,
   servicePackagesTable,
 } from "@workspace/db";
-import { requireAdmin, requireAuth } from "../middlewares/auth";
+import { requireAdmin, requireAuth, requirePartner } from "../middlewares/auth";
 import "../lib/session";
-
-function requirePartner(req: any, res: any, next: any) {
-  if (!req.session.userId) {
-    res.status(401).json({ error: "로그인이 필요합니다" });
-    return;
-  }
-  if (req.session.userRole !== "partner") {
-    res.status(403).json({ error: "파트너만 접근할 수 있습니다" });
-    return;
-  }
-  next();
-}
 
 const router: IRouter = Router();
 
@@ -45,7 +33,19 @@ router.get("/admin/contracts", requireAdmin, async (_req, res): Promise<void> =>
 });
 
 router.post("/admin/contracts", requireAdmin, async (req, res): Promise<void> => {
-  const { packageId, title, content, version, isActive } = req.body;
+  const {
+    packageId,
+    title,
+    content,
+    version,
+    isActive,
+  } = req.body as {
+    packageId?: string | null;
+    title?: string;
+    content?: string;
+    version?: string;
+    isActive?: boolean;
+  };
 
   if (!title?.trim() || !content?.trim()) {
     res.status(400).json({ error: "제목과 내용은 필수입니다" });
@@ -67,8 +67,22 @@ router.post("/admin/contracts", requireAdmin, async (req, res): Promise<void> =>
 });
 
 router.patch("/admin/contracts/:templateId", requireAdmin, async (req, res): Promise<void> => {
-  const { templateId } = req.params;
-  const { packageId, title, content, version, isActive } = req.body;
+  const templateId = Array.isArray(req.params.templateId)
+    ? req.params.templateId[0]
+    : req.params.templateId;
+  const {
+    packageId,
+    title,
+    content,
+    version,
+    isActive,
+  } = req.body as {
+    packageId?: string | null;
+    title?: string;
+    content?: string;
+    version?: string;
+    isActive?: boolean;
+  };
 
   const [existing] = await db
     .select({ id: contractTemplatesTable.id })
@@ -80,7 +94,13 @@ router.patch("/admin/contracts/:templateId", requireAdmin, async (req, res): Pro
     return;
   }
 
-  const updates: Record<string, any> = {};
+  const updates: {
+    packageId?: string | null;
+    title?: string;
+    content?: string;
+    version?: string;
+    isActive?: boolean;
+  } = {};
   if (packageId !== undefined) updates.packageId = packageId || null;
   if (title !== undefined) updates.title = title.trim();
   if (content !== undefined) updates.content = content.trim();
@@ -97,7 +117,9 @@ router.patch("/admin/contracts/:templateId", requireAdmin, async (req, res): Pro
 });
 
 router.delete("/admin/contracts/:templateId", requireAdmin, async (req, res): Promise<void> => {
-  const { templateId } = req.params;
+  const templateId = Array.isArray(req.params.templateId)
+    ? req.params.templateId[0]
+    : req.params.templateId;
   await db.delete(contractTemplatesTable).where(eq(contractTemplatesTable.id, templateId));
   res.json({ ok: true });
 });
@@ -125,6 +147,10 @@ router.get("/contracts/active", requireAuth, async (_req, res): Promise<void> =>
 
 router.get("/partner/contracts", requirePartner, async (req, res): Promise<void> => {
   const userId = req.session.userId;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   const [partner] = await db
     .select({ id: partnerProfilesTable.id })
     .from(partnerProfilesTable)
@@ -155,12 +181,18 @@ router.get("/partner/contracts", requirePartner, async (req, res): Promise<void>
 
 router.post("/partner/contracts", requirePartner, async (req, res): Promise<void> => {
   const userId = req.session.userId;
-  const { templateId } = req.body;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
 
-  if (!templateId) {
+  const { templateId } = req.body as { templateId?: string };
+
+  if (!templateId?.trim()) {
     res.status(400).json({ error: "계약서 ID가 필요합니다" });
     return;
   }
+  const normalizedTemplateId = templateId.trim();
 
   const [partner] = await db
     .select({ id: partnerProfilesTable.id })
@@ -178,7 +210,7 @@ router.post("/partner/contracts", requirePartner, async (req, res): Promise<void
     .where(
       and(
         eq(partnerContractAgreementsTable.partnerId, partner.id),
-        eq(partnerContractAgreementsTable.templateId, templateId)
+        eq(partnerContractAgreementsTable.templateId, normalizedTemplateId),
       )
     );
 
@@ -196,7 +228,7 @@ router.post("/partner/contracts", requirePartner, async (req, res): Promise<void
     .insert(partnerContractAgreementsTable)
     .values({
       partnerId: partner.id,
-      templateId,
+      templateId: normalizedTemplateId,
       status: "agreed",
       agreedAt: new Date(),
     })

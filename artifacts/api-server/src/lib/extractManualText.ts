@@ -20,9 +20,14 @@ export async function extractTextFromManual(objectPath: string, fileType: string
   const buffer = await downloadBuffer(objectPath);
 
   if (fileType === "application/pdf") {
-    const pdfParse = (await import("pdf-parse")).default;
-    const data = await pdfParse(buffer);
-    return data.text.trim();
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: buffer });
+    try {
+      const data = await parser.getText();
+      return data.text.trim();
+    } finally {
+      await parser.destroy();
+    }
   }
 
   if (

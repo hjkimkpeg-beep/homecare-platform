@@ -6,8 +6,13 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+function getParam(req: any, key: string): string {
+  const value = req.params?.[key];
+  return Array.isArray(value) ? value[0] : String(value);
+}
+
 router.get("/packages/:packageId/manuals", async (req, res): Promise<void> => {
-  const { packageId } = req.params;
+  const packageId = getParam(req, "packageId");
   const manuals = await db
     .select()
     .from(serviceManualsTable)
@@ -17,7 +22,7 @@ router.get("/packages/:packageId/manuals", async (req, res): Promise<void> => {
 });
 
 router.post("/packages/:packageId/manuals", requireAdmin, async (req, res): Promise<void> => {
-  const { packageId } = req.params;
+  const packageId = getParam(req, "packageId");
   const { title, description, fileType, objectPath, originalName, fileSize, sortOrder } =
     req.body as {
       title: string;
@@ -65,8 +70,8 @@ router.delete(
   "/packages/:packageId/manuals/:manualId",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const { packageId } = req.params;
-    const manualId = parseInt(req.params.manualId, 10);
+    const packageId = getParam(req, "packageId");
+    const manualId = parseInt(getParam(req, "manualId"), 10);
     if (isNaN(manualId)) {
       res.status(400).json({ error: "잘못된 manualId입니다" });
       return;

@@ -6,6 +6,11 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+function getParam(req: any, key: string): string {
+  const value = req.params?.[key];
+  return Array.isArray(value) ? value[0] : String(value);
+}
+
 router.get("/admin/notifications", requireAdmin, async (req, res): Promise<void> => {
   const { isSent, type } = req.query as Record<string, string>;
 
@@ -34,7 +39,7 @@ router.get("/admin/notifications", requireAdmin, async (req, res): Promise<void>
 });
 
 router.patch("/admin/notifications/:id/send", requireAdmin, async (req, res): Promise<void> => {
-  const { id } = req.params;
+  const id = getParam(req, "id");
 
   const [updated] = await db
     .update(smsNotificationsTable)

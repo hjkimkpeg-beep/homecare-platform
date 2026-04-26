@@ -6,8 +6,13 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+function getParam(req: any, key: string): string {
+  const value = req.params?.[key];
+  return Array.isArray(value) ? value[0] : String(value);
+}
+
 router.get("/packages/:packageId/standard-manual", async (req, res): Promise<void> => {
-  const { packageId } = req.params;
+  const packageId = getParam(req, "packageId");
 
   const [manual] = await db
     .select()
@@ -26,7 +31,7 @@ router.post(
   "/packages/:packageId/standard-manual",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const { packageId } = req.params;
+    const packageId = getParam(req, "packageId");
 
     const [pkg] = await db
       .select()
@@ -75,7 +80,7 @@ router.delete(
   "/packages/:packageId/standard-manual",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const { packageId } = req.params;
+    const packageId = getParam(req, "packageId");
 
     await db
       .delete(packageStandardManualsTable)

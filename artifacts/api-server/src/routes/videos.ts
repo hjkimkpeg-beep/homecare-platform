@@ -14,6 +14,11 @@ import "../lib/session";
 
 const router: IRouter = Router();
 
+function getParam(req: any, key: string): string {
+  const value = req.params?.[key];
+  return Array.isArray(value) ? value[0] : String(value);
+}
+
 const VIDEO_SCRIPT_PROMPT = `당신은 홈케어 서비스 교육 영상 전문가입니다.
 아래 서비스 매뉴얼 내용을 기반으로, 파트너(기술자)와 고객 모두가 이해할 수 있는
 6단계 서비스 안내 영상 스크립트를 JSON 배열로 작성해주세요.
@@ -40,7 +45,7 @@ router.post(
   "/packages/:packageId/generate-video",
   requireAdmin,
   async (req, res): Promise<void> => {
-    const { packageId } = req.params;
+    const packageId = getParam(req, "packageId");
 
     const [pkg] = await db
       .select()
@@ -131,7 +136,7 @@ router.post(
 );
 
 router.get("/packages/:packageId/video", async (req, res): Promise<void> => {
-  const { packageId } = req.params;
+  const packageId = getParam(req, "packageId");
 
   const [video] = await db
     .select()
